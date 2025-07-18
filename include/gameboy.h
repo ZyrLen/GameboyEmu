@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #define KiB 1024 // 1024 bytes
+#define MEM_SIZE (0x10000)
 // 0x1000 is 4 KiB
 #define ROM_SIZE (0x4000)
 #define VRAM_SIZE (0x2000)
@@ -15,7 +16,7 @@
 #define io_SIZE (0x80)
 #define HRAM_SIZE (0x80)
 
-#define CartHeaderStartAddress 0x100
+#define CartStartAddress 0x100
 #define CartHeaderSize 0x50
 
 typedef struct Gameboy {
@@ -47,11 +48,14 @@ typedef struct Gameboy {
     uint16_t HL;
   };
 
-  uint8_t state;
-} Gameboy;
+  uint8_t state; // Tracks clock cycles
+  uint8_t z;     // Zero flag
+  uint8_t n;     // Subtraction Flag (BCD)
+  uint8_t h;     // Half Carry Flag (BCD)
+  uint8_t c;     // Carry Flag
 
-/* Memory map */
-typedef struct MMU {
+  /* Memory Map (MMU) */
+  int biosComplete;
   uint8_t bios[0x100];
   union {
     uint8_t mem[0x10000];
@@ -68,15 +72,37 @@ typedef struct MMU {
       uint8_t IE;                      // FFFF
     };
   };
-  uint8_t *finished_bios;
-} MMU;
+
+} Gameboy;
 
 /* General Opcode Functions */
+/*
+ADD (address)    DEC r              LD A,(address)    LD rr,d16     RET
+BIT n,r          INC r              LD r,r            LD (HL+),A    RLA
+CALL address     INC rr             LD r,d8           LD (HL-),A    RL r
+CP d8            JR cond,address    LD r,(address)    POP rr        SUB r
+CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
+*/
 // Once Cycle instructions, does not include HL as operands
-void LD_Reg(uint8_t *x, uint8_t *y) { *x = *y; }
-void NOP() {}
-void ADD() {}
-void SUB() {}
-void XOR() {}
+// Right half of list for now
+void LD_A_Addr();
+void LD_R_R();
+void LD_R_d8();
+void LD_R_Addr();
+void LD_Addr_R();
+void LD_RR_d16();
+void LD_HLplus_A();
+void LD_HLminus_A();
+void POP_RR();
+void PUSH_RR();
+void RET();
+void RLA();
+void RL_R();
+void SUB_R();
+void XOR_R();
+void NOP(Gameboy *gb);
+void ADD();
+void SUB();
+void XOR();
 
 #endif
