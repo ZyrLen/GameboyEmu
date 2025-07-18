@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,17 +20,17 @@
 */
 
 /**
- * # CategoryMisc
+ *  \file SDL_misc.h
  *
- * Include file for SDL API functions that don't fit elsewhere.
+ *  \brief Include file for SDL API functions that don't fit elsewhere.
  */
 
 #ifndef SDL_misc_h_
 #define SDL_misc_h_
 
-#include <SDL2/SDL_stdinc.h>
+#include "SDL_stdinc.h"
 
-#include <SDL2/begin_code.h>
+#include "begin_code.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -72,7 +72,7 @@ extern DECLSPEC int SDLCALL SDL_OpenURL(const char *url);
 #ifdef __cplusplus
 }
 #endif
-#include <SDL2/close_code.h>
+#include "close_code.h"
 
 #endif /* SDL_misc_h_ */
 

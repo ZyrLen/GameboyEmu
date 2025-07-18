@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,7 +20,7 @@
 */
 
 /**
- * # CategoryClipboard
+ * \file SDL_clipboard.h
  *
  * Include file for SDL clipboard handling
  */
@@ -28,9 +28,9 @@
 #ifndef SDL_clipboard_h_
 #define SDL_clipboard_h_
 
-#include <SDL2/SDL_stdinc.h>
+#include "SDL_stdinc.h"
 
-#include <SDL2/begin_code.h>
+#include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
 extern "C" {
@@ -41,7 +41,7 @@ extern "C" {
 /**
  * Put UTF-8 text into the clipboard.
  *
- * \param text the text to store in the clipboard.
+ * \param text the text to store in the clipboard
  * \returns 0 on success or a negative error code on failure; call
  *          SDL_GetError() for more information.
  *
@@ -85,7 +85,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_HasClipboardText(void);
 /**
  * Put UTF-8 text into the primary selection.
  *
- * \param text the text to store in the primary selection.
+ * \param text the text to store in the primary selection
  * \returns 0 on success or a negative error code on failure; call
  *          SDL_GetError() for more information.
  *
@@ -134,7 +134,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_HasPrimarySelectionText(void);
 #ifdef __cplusplus
 }
 #endif
-#include <SDL2/close_code.h>
+#include "close_code.h"
 
 #endif /* SDL_clipboard_h_ */
 

@@ -15,7 +15,7 @@ ifeq ($(UNAME), Windows_NT)
 	LDFLAGS=-L$(SDL_LIB) -lSDL2
 endif
 
-CFLAGS=-Iinclude/SDL2 -Wall -Wextra -pedantic -std=c99
+CFLAGS=-Wall -Wextra -pedantic -std=c11 -Iinclude
 
 main: src/main.c
 	$(CC) $(CFLAGS) src/main.c -o main $(LDFLAGS)
