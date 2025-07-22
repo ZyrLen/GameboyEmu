@@ -16,7 +16,7 @@ ifeq ($(UNAME), Windows_NT)
 endif
 
 CFLAGS=-Wall -Wextra -pedantic -std=c11 -Iinclude
-OBJS=src/main.o src/gameboy.o src/opcodes.o
+OBJS=src/main.o src/gameboy.o src/opcodes.o src/CBopcodes.o
 
 TARGET=main
 

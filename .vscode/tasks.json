@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Emulator",
+      "type": "shell",
+      "command": "cc",
+      "args": [
+        "-g",
+        "-Iinclude", // Include path for headers
+        "src/*.c", // Compile all C source files
+        "-o",
+        "main" // Output binary
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    }
+  ]
+}

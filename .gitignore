@@ -1,5 +1,5 @@
 roms
 test.c
 test
-.vscode
 *.o
+main

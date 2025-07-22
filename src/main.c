@@ -78,7 +78,7 @@ void gameboyInit() {
   gb.BC = 0;
   gb.DE = 0;
   gb.HL = 0;
-  gb.sp = 1;
+  gb.sp = 0;
   gb.pc = 0;
 
   memset(&gb.mem, 0, sizeof(gb.mem));
@@ -93,18 +93,19 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     char *filename = argv[1];
     load_rom(filename);
-  }
+  } // else {
+    // printf("No rom loaded.\n");
+    // return 0;
+    //}
 
   gameboyInit(&gb);
-  initOpcodeTable();
+  initOpcodeTable(&gb);
+  initCBOpcodeTable(&gb);
+  uint8_t opcode;
+  uint8_t CBopcode;
+  OpcodeEntry entry;
 
-  uint8_t opcode = gb.mem[gb.pc++];
-
-  if (opcode == 0x31) {
-    gb.sp = gb.mem[gb.pc] | (gb.mem[gb.pc + 1] << 8);
-    gb.pc += 2;
-  }
-
+  printf("BIOS ROM:\n");
   for (int i = 0; i < 256; i++) { printf("%02X ", gb.mem[i]); }
   if (argv[1]) {
     printf("\nStarting rom:\n");
@@ -114,10 +115,18 @@ int main(int argc, char **argv) {
   }
 
   for (int i = 0; i < 10; i++) {
-    if (i == 0) { printf("\nThis starts with the initial PC\n"); }
-    printf("C.pc: %u\n", gb.pc);
-    opcodeTable[0](&gb);
+    opcode = gb.mem[gb.pc++];
+    if (opcode == 0xCB) {
+      CBopcode = gb.mem[gb.pc++];
+      entry = CBopcodeTable[CBopcode];
+      printf("CB:\n");
+      printf("0x%02X    %s\n", CBopcode, entry.mnemonic);
+      entry.handler(&gb, &entry);
+    } else {
+      entry = opcodeTable[opcode];
+      printf("0x%02X    %s\n", opcode, entry.mnemonic);
+      entry.handler(&gb, entry.arg);
+    }
   }
-
   return 0;
 }

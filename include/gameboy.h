@@ -75,6 +75,8 @@ typedef struct Gameboy {
 
 } Gameboy;
 
+extern Gameboy gb;
+
 /* General Opcode Functions */
 /*
 ADD (address)    DEC r              LD A,(address)    LD rr,d16     RET
@@ -85,6 +87,7 @@ CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
 */
 // Once Cycle instructions, does not include HL as operands
 // Right half of list for now
+void LD_SP_d16();
 void LD_A_Addr();
 void LD_R_R();
 void LD_R_d8();
@@ -100,9 +103,19 @@ void RLA();
 void RL_R();
 void SUB_R();
 void XOR_R();
-void NOP(Gameboy *gb);
+void NOP();
 void ADD();
 void SUB();
 void XOR();
+void JR_NZ();
+void JR_NC();
+void JR_Z();
+void JR_C();
+void JR();
+
+// CB:
+
+void BIT_R();
+void BIT_RR();
 
 #endif
