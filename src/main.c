@@ -98,15 +98,17 @@ int main(int argc, char **argv) {
     // return 0;
     //}
 
-  gameboyInit(&gb);
+  gameboyInit();
   initOpcodeTable(&gb);
   initCBOpcodeTable(&gb);
   uint8_t opcode;
   uint8_t CBopcode;
+  uint16_t opcodeAddress;
+  char Unimplemented[16] = "Not implemented";
+  const char *printMessage;
   OpcodeEntry entry;
+  int exitFlag = 0;
 
-  printf("BIOS ROM:\n");
-  for (int i = 0; i < 256; i++) { printf("%02X ", gb.mem[i]); }
   if (argv[1]) {
     printf("\nStarting rom:\n");
     for (uint64_t i = 0x00; i < 0x400; i++) { printf("%02X ", gb.mem[i]); }
@@ -114,19 +116,38 @@ int main(int argc, char **argv) {
     printf("\nNo rom loaded.\n");
   }
 
-  for (int i = 0; i < 10; i++) {
+  while (1) {
+    opcodeAddress = gb.pc;
     opcode = gb.mem[gb.pc++];
     if (opcode == 0xCB) {
       CBopcode = gb.mem[gb.pc++];
       entry = CBopcodeTable[CBopcode];
       printf("CB:\n");
-      printf("0x%02X    %s\n", CBopcode, entry.mnemonic);
+      // Prints the address of CB, not the byte after it
+      if (entry.mnemonic) {
+        printMessage = entry.mnemonic;
+      } else {
+        printMessage = Unimplemented;
+        exitFlag = 1;
+      }
+      printf("0x%02X    %s    Address: $%04X\n", CBopcode, printMessage,
+        opcodeAddress);
+      if (exitFlag) { break; }
       entry.handler(&gb, &entry);
     } else {
       entry = opcodeTable[opcode];
-      printf("0x%02X    %s\n", opcode, entry.mnemonic);
-      entry.handler(&gb, entry.arg);
+      if (entry.mnemonic) {
+        printMessage = entry.mnemonic;
+      } else {
+        printMessage = Unimplemented;
+        exitFlag = 1;
+      }
+      printf("0x%02X    %s    Address: $%04X\n", opcode, printMessage,
+        opcodeAddress);
+      if (exitFlag) { break; }
+      entry.handler(&gb, &entry);
     }
   }
+
   return 0;
 }

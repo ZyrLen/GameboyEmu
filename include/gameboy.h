@@ -79,43 +79,53 @@ extern Gameboy gb;
 
 /* General Opcode Functions */
 /*
-ADD (address)    DEC r              LD A,(address)    LD rr,d16     RET
+ADD (address)    DEC r              LD A,(address)    LD rr,u16     RET
 BIT n,r          INC r              LD r,r            LD (HL+),A    RLA
-CALL address     INC rr             LD r,d8           LD (HL-),A    RL r
-CP d8            JR cond,address    LD r,(address)    POP rr        SUB r
+CALL address     INC rr             LD r,u8           LD (HL-),A    RL r
+CP u8            JR cond,address    LD r,(address)    POP rr        SUB r
 CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
 */
 // Once Cycle instructions, does not include HL as operands
 // Right half of list for now
-void LD_SP_d16();
-void LD_A_Addr();
-void LD_R_R();
-void LD_R_d8();
-void LD_R_Addr();
-void LD_Addr_R();
-void LD_RR_d16();
-void LD_HLplus_A();
-void LD_HLminus_A();
-void POP_RR();
-void PUSH_RR();
-void RET();
-void RLA();
-void RL_R();
-void SUB_R();
-void XOR_R();
-void NOP();
-void ADD();
-void SUB();
-void XOR();
-void JR_NZ();
-void JR_NC();
-void JR_Z();
-void JR_C();
-void JR();
+
+void CP_i8(Gameboy *gb, void *entryptr);
+void CP_R(Gameboy *gb, void *entryptr); // compare, SUB R but doesn't update A
+void CALL_u16(Gameboy *gb, void *entryptr);
+void LD_SP_u16(Gameboy *gb, void *entryptr);
+void LD_A_Addr(Gameboy *gb, void *entryptr);
+void LD_R_R(Gameboy *gb, void *entryptr);
+void LD_R_u8(Gameboy *gb, void *entryptr);
+void LD_R_Addr(Gameboy *gb, void *entryptr);
+void LD_R_AddrPlusu8(Gameboy *gb, void *entryptr);
+void LD_Addr_R(Gameboy *gb, void *entryptr);
+void LD_u16Addr_R(Gameboy *gb, void *entryptr);
+void LD_AddrPlusu8_R(Gameboy *gb, void *entryptr);
+void LD_RR_u16(Gameboy *gb, void *entryptr);
+void LD_HLplus_A(Gameboy *gb, void *entryptr);
+void LD_HLminus_A(Gameboy *gb, void *entryptr);
+void POP_RR(Gameboy *gb, void *entryptr);
+void PUSH_RR(Gameboy *gb, void *entryptr);
+void RET(Gameboy *gb, void *entryptr);
+void RLA(Gameboy *gb, void *entryptr);
+void RL_R(Gameboy *gb, void *entryptr); // Rotate left
+void SUB_R(Gameboy *gb, void *entryptr);
+void XOR_R(Gameboy *gb, void *entryptr);
+void NOP(Gameboy *gb, void *entryptr);
+void ADD(Gameboy *gb, void *entryptr);
+void SUB(Gameboy *gb, void *entryptr);
+void XOR(Gameboy *gb, void *entryptr);
+void JR_NZ(Gameboy *gb, void *entryptr);
+void JR_NC(Gameboy *gb, void *entryptr);
+void JR_Z(Gameboy *gb, void *entryptr);
+void JR_C(Gameboy *gb, void *entryptr);
+void JR(Gameboy *gb, void *entryptr);
+void INC_R(Gameboy *gb, void *entryptr);
+void INC_RR(Gameboy *gb, void *entryptr);
+void DEC_R(Gameboy *gb, void *entryptr);
 
 // CB:
 
-void BIT_R();
-void BIT_RR();
+void BIT_R(Gameboy *gb, void *entryptr);
+void BIT_RR(Gameboy *gb, void *entryptr);
 
 #endif
