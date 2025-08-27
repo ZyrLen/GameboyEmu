@@ -6,7 +6,9 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/main",
-      "args": [],
+      "args": [
+        //"roms/03-op sp,hl.gb"
+      ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

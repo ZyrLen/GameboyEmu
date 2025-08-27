@@ -13,6 +13,8 @@
 
 // resolution is 160 x 144
 
+#define MAX_EXECUTIONS 10
+
 Gameboy gb;
 
 uint8_t DMG_BIOS[0x100] = {0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB,
@@ -45,6 +47,8 @@ int load_rom(const char *filename) {
     return 0;
   }
 
+  memset(&gb.mem[0], 0, 0x100);
+
   fseek(rom, 0, SEEK_END);
   long rom_size = ftell(rom);
   rewind(rom);
@@ -57,7 +61,7 @@ int load_rom(const char *filename) {
     return 0;
   }
 
-  size_t bytes_read = fread(&gb.mem[CartStartAddress], 1, rom_size, rom);
+  size_t bytes_read = fread(&gb.mem[0], 1, rom_size, rom);
   if (bytes_read != (size_t)rom_size) {
     fprintf(stderr, "Failed to read full ROM\n");
     fclose(rom);
@@ -80,6 +84,7 @@ void gameboyInit() {
   gb.HL = 0;
   gb.sp = 0;
   gb.pc = 0;
+  gb.HALT_ON = 0;
 
   memset(&gb.mem, 0, sizeof(gb.mem));
   memcpy(&gb.mem, &gb.bios, sizeof(gb.bios));
@@ -90,17 +95,12 @@ void gameboyInit() {
 
 int main(int argc, char **argv) {
 
-  if (argc == 2) {
-    char *filename = argv[1];
-    load_rom(filename);
-  } // else {
-    // printf("No rom loaded.\n");
-    // return 0;
-    //}
+  uint16_t executed[0x10000] = {0};
 
   gameboyInit();
   initOpcodeTable(&gb);
   initCBOpcodeTable(&gb);
+
   uint8_t opcode;
   uint8_t CBopcode;
   uint16_t opcodeAddress;
@@ -108,44 +108,80 @@ int main(int argc, char **argv) {
   const char *printMessage;
   OpcodeEntry entry;
   int exitFlag = 0;
+  int romLoaded;
 
-  if (argv[1]) {
-    printf("\nStarting rom:\n");
-    for (uint64_t i = 0x00; i < 0x400; i++) { printf("%02X ", gb.mem[i]); }
+  if (argc == 2) {
+    char *filename = argv[1];
+    if (filename) {
+      romLoaded = load_rom(filename);
+      if (romLoaded == 0) { return 0; }
+      gb.pc = 0x100;
+      // gb.IME = 0;
+      printf("\nStarting rom:\n");
+      for (uint64_t i = 0x00; i < 2 * ROM_SIZE; i++) {
+        printf("%02X ", gb.mem[i]);
+      }
+      printf("\n\n");
+      exitFlag = 0;
+    }
   } else {
-    printf("\nNo rom loaded.\n");
+    printf("No rom loaded.\n");
+    printf("Executing BIOS\n");
+    // return 0;
   }
 
+  // i/o[0x44]
+  // CMP 0x90
+  gb.io[0x0] = 0x90;
+  uint64_t k = 0;
+
+  gb.pc = 0;
+
   while (1) {
-    opcodeAddress = gb.pc;
-    opcode = gb.mem[gb.pc++];
-    if (opcode == 0xCB) {
-      CBopcode = gb.mem[gb.pc++];
-      entry = CBopcodeTable[CBopcode];
-      printf("CB:\n");
-      // Prints the address of CB, not the byte after it
-      if (entry.mnemonic) {
-        printMessage = entry.mnemonic;
+    if (!gb.HALT_ON) {
+      opcodeAddress = gb.pc;
+      opcode = gb.mem[gb.pc++];
+      if (opcode == 0xCB) {
+        CBopcode = gb.mem[gb.pc++];
+        entry = CBopcodeTable[CBopcode];
+        if (entry.mnemonic) {
+          printMessage = entry.mnemonic;
+        } else {
+          printMessage = Unimplemented;
+          exitFlag = 1;
+        }
+        if (executed[opcodeAddress] < 2) {
+          printf("0x%02X  |  %-15s    $%04X\n", CBopcode, printMessage,
+            opcodeAddress);
+        }
+        if (exitFlag) { break; }
+        entry.handler(&gb, &entry);
+        executed[opcodeAddress] += 1;
+
       } else {
-        printMessage = Unimplemented;
-        exitFlag = 1;
+        entry = opcodeTable[opcode];
+        if (entry.mnemonic) {
+          printMessage = entry.mnemonic;
+        } else {
+          printMessage = Unimplemented;
+          exitFlag = 1;
+        }
+        if (executed[opcodeAddress] < 2) {
+          printf(
+            "0x%02X  |  %-15s    $%04X\n", opcode, printMessage, opcodeAddress);
+        }
+        if (exitFlag) { break; }
+        entry.handler(&gb, &entry);
+        // if (executed[opcodeAddress] > 2) { executed[opcodeAddress] = 2; }
+        executed[opcodeAddress] += 1;
       }
-      printf("0x%02X    %s    Address: $%04X\n", CBopcode, printMessage,
-        opcodeAddress);
-      if (exitFlag) { break; }
-      entry.handler(&gb, &entry);
     } else {
-      entry = opcodeTable[opcode];
-      if (entry.mnemonic) {
-        printMessage = entry.mnemonic;
+      if (k > 99999999) {
+        printf("System is Halted\n");
+        k = 0;
       } else {
-        printMessage = Unimplemented;
-        exitFlag = 1;
+        k++;
       }
-      printf("0x%02X    %s    Address: $%04X\n", opcode, printMessage,
-        opcodeAddress);
-      if (exitFlag) { break; }
-      entry.handler(&gb, &entry);
     }
   }
 

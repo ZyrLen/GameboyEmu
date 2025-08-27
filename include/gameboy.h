@@ -3,21 +3,21 @@
 
 #include <stdint.h>
 
-#define KiB 1024 // 1024 bytes
-#define MEM_SIZE (0x10000)
 // 0x1000 is 4 KiB
+#define MEM_SIZE (0x10000)
 #define ROM_SIZE (0x4000)
 #define VRAM_SIZE (0x2000)
 #define WRAM_SIZE (0x2000)
 #define ERAM_SIZE (0x2000)
 #define EchoRAM_SIZE (0x1E00)
 #define OAM_SIZE (0xA0)
-#define Unusable_SIZE (0x80)
+// Unusable_SIZE is FEFF - FEA0 + 1
+#define Unusable_SIZE (0x60)
 #define io_SIZE (0x80)
 #define HRAM_SIZE (0x80)
-
 #define CartStartAddress 0x100
 #define CartHeaderSize 0x50
+#define IF io[0xF]
 
 typedef struct Gameboy {
   uint16_t pc;
@@ -73,6 +73,8 @@ typedef struct Gameboy {
     };
   };
 
+  uint8_t HALT_ON;
+  uint8_t IME;
 } Gameboy;
 
 extern Gameboy gb;
@@ -108,20 +110,26 @@ void PUSH_RR(Gameboy *gb, void *entryptr);
 void RET(Gameboy *gb, void *entryptr);
 void RLA(Gameboy *gb, void *entryptr);
 void RL_R(Gameboy *gb, void *entryptr); // Rotate left
+
 void SUB_R(Gameboy *gb, void *entryptr);
+void SUB_R_HL(Gameboy *gb, void *entryptr);
+void SUB_R_u8(Gameboy *gb, void *entryptr);
+
 void XOR_R(Gameboy *gb, void *entryptr);
 void NOP(Gameboy *gb, void *entryptr);
-void ADD(Gameboy *gb, void *entryptr);
-void SUB(Gameboy *gb, void *entryptr);
+
 void XOR(Gameboy *gb, void *entryptr);
 void JR_NZ(Gameboy *gb, void *entryptr);
 void JR_NC(Gameboy *gb, void *entryptr);
 void JR_Z(Gameboy *gb, void *entryptr);
 void JR_C(Gameboy *gb, void *entryptr);
 void JR(Gameboy *gb, void *entryptr);
+void JP(Gameboy *gb, void *entryptr);
 void INC_R(Gameboy *gb, void *entryptr);
 void INC_RR(Gameboy *gb, void *entryptr);
 void DEC_R(Gameboy *gb, void *entryptr);
+
+void HALT(Gameboy *gb, void *entryptr);
 
 // CB:
 

@@ -80,6 +80,9 @@ void LD_R_AddrPlusu8(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = entry->BitArgs.R;
   uint16_t addr = 0xFF00 + gb->mem[gb->pc++];
+  // DEBUG
+  gb->mem[0xFF44] = 0x90;
+
   *R = gb->mem[addr];
 }
 
@@ -176,11 +179,34 @@ void XOR_R(Gameboy *gb, void *entryptr) {
 
 void NOP(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
-  gb->pc++;
+  UNUSED(gb);
 }
 
 // void ADD(Gameboy *gb, void *entryptr) {}
-// void SUB(Gameboy *gb, void *entryptr) {}
+
+void SUB_R(Gameboy *gb, void *entryptr) { // SUB A,R
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+  uint8_t *R = entry->arg;
+  uint8_t value = *R;
+  uint8_t A = gb->A;
+  uint8_t result = A - value;
+
+  gb->z = (result == 0);
+  gb->n = 1;
+  gb->h = ((A & 0xF) < (value & 0xF));
+  gb->c = (A < value);
+}
+
+/*
+void SUB_R_HL(Gameboy *gb, void *entryptr) {
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+}
+
+void SUB_R_u8(Gameboy *gb, void *entryptr) {
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+}
+*/
+
 // void XOR(Gameboy *gb, void *entryptr) {}
 
 void JR_Z(Gameboy *gb, void *entryptr) {
@@ -195,6 +221,12 @@ void JR_NZ(Gameboy *gb, void *entryptr) {
   int8_t e = gb->mem[gb->pc++];
   // e is negative if the msb = 1. (2's complement), so e is in [-128,+127]
   if (gb->z == 0) gb->pc += e;
+}
+
+void JP(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint16_t addr = ((uint16_t)gb->mem[gb->pc + 1] << 8) | gb->mem[gb->pc];
+  gb->pc = addr;
 }
 
 void INC_R(Gameboy *gb, void *entryptr) {
@@ -232,6 +264,11 @@ void DEC_R(Gameboy *gb, void *entryptr) {
   gb->n = 1;
   gb->h = ((value & 0x0F) == 0);
   *R = result;
+}
+
+void HALT(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  gb->HALT_ON = 1;
 }
 
 // CB
