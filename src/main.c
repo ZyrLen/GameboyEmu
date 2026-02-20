@@ -102,7 +102,6 @@ int main(int argc, char **argv) {
   initCBOpcodeTable(&gb);
 
   uint8_t opcode;
-  uint8_t CBopcode;
   uint16_t opcodeAddress;
   char Unimplemented[16] = "Not implemented";
   const char *printMessage;
@@ -141,40 +140,28 @@ int main(int argc, char **argv) {
     if (!gb.HALT_ON) {
       opcodeAddress = gb.pc;
       opcode = gb.mem[gb.pc++];
-      if (opcode == 0xCB) {
-        CBopcode = gb.mem[gb.pc++];
-        entry = CBopcodeTable[CBopcode];
-        if (entry.mnemonic) {
-          printMessage = entry.mnemonic;
-        } else {
-          printMessage = Unimplemented;
-          exitFlag = 1;
-        }
-        if (executed[opcodeAddress] < 2) {
-          printf("0x%02X  |  %-15s    $%04X\n", CBopcode, printMessage,
-            opcodeAddress);
-        }
-        if (exitFlag) { break; }
-        entry.handler(&gb, &entry);
-        executed[opcodeAddress] += 1;
 
+      if (opcode == 0xCB) {
+        opcode = gb.mem[gb.pc++];
+        entry = CBopcodeTable[opcode];
       } else {
         entry = opcodeTable[opcode];
-        if (entry.mnemonic) {
-          printMessage = entry.mnemonic;
-        } else {
-          printMessage = Unimplemented;
-          exitFlag = 1;
-        }
-        if (executed[opcodeAddress] < 2) {
-          printf(
-            "0x%02X  |  %-15s    $%04X\n", opcode, printMessage, opcodeAddress);
-        }
-        if (exitFlag) { break; }
-        entry.handler(&gb, &entry);
-        // if (executed[opcodeAddress] > 2) { executed[opcodeAddress] = 2; }
-        executed[opcodeAddress] += 1;
       }
+
+      if (entry.mnemonic) {
+        printMessage = entry.mnemonic;
+      } else {
+        printMessage = Unimplemented;
+        exitFlag = 1;
+      }
+      if (executed[opcodeAddress] < 2) {
+        printf(
+          "0x%02X  |  %-15s    $%04X\n", opcode, printMessage, opcodeAddress);
+      }
+      if (exitFlag) break;
+      entry.handler(&gb, &entry); // Executes instruction
+      // if (executed[opcodeAddress] > 2) { executed[opcodeAddress] = 2; }
+      executed[opcodeAddress] += 1;
     } else {
       if (k > 99999999) {
         printf("System is Halted\n");

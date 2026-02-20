@@ -25,7 +25,7 @@ void CP_i8(Gameboy *gb, void *entryptr) {
 
 void CP_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint8_t *R = entry->BitArgs.R;
+  uint8_t *R = entry->arg;
   uint8_t A = gb->A;
 
   gb->z = (A == *R);
@@ -71,14 +71,14 @@ void LD_R_u8(Gameboy *gb, void *entryptr) {
 
 void LD_R_Addr(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint8_t *R = entry->BitArgs.R;
-  uint16_t addr = entry->BitArgs.address;
+  uint8_t *R = entry->arg;
+  uint16_t addr = entry->address;
   *R = gb->mem[addr];
 }
 
 void LD_R_AddrPlusu8(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint8_t *R = entry->BitArgs.R;
+  uint8_t *R = entry->arg;
   uint16_t addr = 0xFF00 + gb->mem[gb->pc++];
   // DEBUG
   gb->mem[0xFF44] = 0x90;
@@ -88,15 +88,15 @@ void LD_R_AddrPlusu8(Gameboy *gb, void *entryptr) {
 
 void LD_Addr_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint16_t addr = entry->BitArgs.address;
-  uint8_t *R = entry->BitArgs.R;
+  uint16_t addr = entry->address;
+  uint8_t *R = entry->arg;
   gb->mem[addr] = *R;
 }
 
 void LD_u16Addr_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint16_t addr = gb->mem[gb->pc] | (uint16_t)(gb->mem[gb->pc + 1] << 8);
-  uint8_t *R = entry->BitArgs.R;
+  uint8_t *R = entry->arg;
   gb->mem[addr] = *R;
   gb->pc += 2;
 }
@@ -127,7 +127,7 @@ void LD_HLminus_A(Gameboy *gb, void *entryptr) {
 
 void PUSH_RR(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint16_t *RR = entry->BitArgs.RR;
+  uint16_t *RR = entry->arg;
   uint8_t RR_msb = (*RR >> 8) & 0xFF;
   uint8_t RR_lsb = *RR & 0xFF;
   gb->sp--;
@@ -137,7 +137,7 @@ void PUSH_RR(Gameboy *gb, void *entryptr) {
 
 void POP_RR(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint16_t *RR = entry->BitArgs.RR;
+  uint16_t *RR = entry->arg;
   uint8_t SP_lsb = gb->mem[gb->sp++];
   uint8_t SP_msb = gb->mem[gb->sp++];
   *RR = ((uint16_t)SP_msb << 8) | SP_lsb;
@@ -238,7 +238,7 @@ void JP(Gameboy *gb, void *entryptr) {
 
 void INC_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint8_t *R = entry->BitArgs.R;
+  uint8_t *R = entry->arg;
   if (*R + 1 == 0) {
     gb->z = 1;
   } else {
@@ -257,13 +257,13 @@ void INC_R(Gameboy *gb, void *entryptr) {
 void INC_RR(Gameboy *gb, void *entryptr) {
   UNUSED(gb);
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint16_t *RR = entry->BitArgs.RR;
+  uint16_t *RR = entry->arg;
   (*RR)++;
 }
 
 void DEC_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint8_t *R = entry->BitArgs.R;
+  uint8_t *R = entry->arg;
   uint8_t value = *R;
   uint8_t result = value - 1;
   // 0bxxxx0000 Half carry only occurs if low nibble == 0
@@ -282,7 +282,7 @@ void HALT(Gameboy *gb, void *entryptr) {
 void BIT_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t nbit = entry->BitArgs.nbit;
-  uint8_t *R = entry->BitArgs.R;
+  uint8_t *R = entry->arg;
 
   uint8_t bit_set = ((*R >> nbit) & 1);
   if (!bit_set) {
@@ -298,7 +298,7 @@ void BIT_R(Gameboy *gb, void *entryptr) {
 
 void RL_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
-  uint8_t *R = entry->BitArgs.R;
+  uint8_t *R = entry->arg;
   uint8_t newCarryBit = (*R >> 7) & 1;
   uint8_t new0thBit = gb->c;
   *R = *R << 1;

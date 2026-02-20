@@ -15,10 +15,8 @@ typedef struct {
   uint8_t *R2; // Used for Two Register instructions
   struct {
     uint8_t nbit;
-    uint8_t *R;
-    uint16_t *RR;
-    uint16_t address;
   } BitArgs;
+  uint16_t address;
 
 } OpcodeEntry;
 
