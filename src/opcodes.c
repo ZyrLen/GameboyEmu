@@ -43,8 +43,14 @@ void initOpcodeTable(Gameboy *gb) {
   opcodeTable[0x15] = (OpcodeEntry){
     .handler = DEC_R, .BitArgs.R = &gb->D, .mcycles = 1, .mnemonic = "DEC D"};
 
+  opcodeTable[0x16] = (OpcodeEntry){
+    .handler = LD_R_u8, .arg = &gb->D, .mcycles = 2, .mnemonic = "LD D,u8"};
+
   opcodeTable[0x17] =
     (OpcodeEntry){.handler = RLA, .mcycles = 1, .mnemonic = "RLA"};
+
+  opcodeTable[0x18] =
+    (OpcodeEntry){.handler = JR, .mcycles = 3, .mnemonic = "JR i8"};
 
   opcodeTable[0x1A] = (OpcodeEntry){.handler = LD_R_Addr,
     .BitArgs = {.R = &gb->A, .address = gb->DE},
@@ -480,6 +486,8 @@ void initOpcodeTable(Gameboy *gb) {
 
   opcodeTable[0xAF] = (OpcodeEntry){
     .handler = XOR_R, .arg = &gb->A, .mcycles = 1, .mnemonic = "XOR A,A"};
+
+  // opcodeTable[0xBE] = (OpcodeEntry){.handler = };
 
   opcodeTable[0xC1] = (OpcodeEntry){.handler = POP_RR,
     .BitArgs.RR = &gb->BC,

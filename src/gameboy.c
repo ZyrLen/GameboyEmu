@@ -209,6 +209,13 @@ void SUB_R_u8(Gameboy *gb, void *entryptr) {
 
 // void XOR(Gameboy *gb, void *entryptr) {}
 
+void JR(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  int8_t e = gb->mem[gb->pc++];
+  // e is negative if the msb = 1. (2's complement), so e is in [-128,+127]
+  gb->pc += e;
+}
+
 void JR_Z(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
   int8_t e = gb->mem[gb->pc++];

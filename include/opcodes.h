@@ -6,13 +6,13 @@
 typedef struct Gameboy Gameboy;
 
 typedef struct {
-  void *arg;
+  void *arg; // Used for single Register (R or RR) instructions, and SP value
   void (*handler)(Gameboy *gb, void *arg);
   const char *mnemonic;
   uint8_t mcycles;
   uint8_t mcyclesTrue;
-  uint8_t *R1;
-  uint8_t *R2;
+  uint8_t *R1; // Used for Two Register instructions
+  uint8_t *R2; // Used for Two Register instructions
   struct {
     uint8_t nbit;
     uint8_t *R;
@@ -24,6 +24,6 @@ typedef struct {
 
 extern OpcodeEntry opcodeTable[256];
 
-void initOpcodeTable();
+void initOpcodeTable(Gameboy *gb);
 
 #endif
