@@ -76,7 +76,7 @@ int load_rom(const char *filename) {
 
 /***  init  ***/
 
-void gameboyInit() {
+void gameboyInit(void) {
   memcpy(gb.bios, DMG_BIOS, sizeof(DMG_BIOS));
   gb.AF = 0;
   gb.BC = 0;

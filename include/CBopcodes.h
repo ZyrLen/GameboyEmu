@@ -6,6 +6,6 @@
 
 extern OpcodeEntry CBopcodeTable[256];
 
-void initCBOpcodeTable();
+void initCBOpcodeTable(Gameboy *gb);
 
 #endif

@@ -1,0 +1,66 @@
+[
+ {
+  "directory": "/home/gman/GameboyEmu",
+  "arguments": [
+   "cc",
+   "-Wall",
+   "-Wextra",
+   "-pedantic",
+   "-std=c11",
+   "-Iinclude",
+   "-c",
+   "src/main.c",
+   "-o",
+   "src/main.o"
+  ],
+  "file": "src/main.c"
+ },
+ {
+  "directory": "/home/gman/GameboyEmu",
+  "arguments": [
+   "cc",
+   "-Wall",
+   "-Wextra",
+   "-pedantic",
+   "-std=c11",
+   "-Iinclude",
+   "-c",
+   "src/gameboy.c",
+   "-o",
+   "src/gameboy.o"
+  ],
+  "file": "src/gameboy.c"
+ },
+ {
+  "directory": "/home/gman/GameboyEmu",
+  "arguments": [
+   "cc",
+   "-Wall",
+   "-Wextra",
+   "-pedantic",
+   "-std=c11",
+   "-Iinclude",
+   "-c",
+   "src/opcodes.c",
+   "-o",
+   "src/opcodes.o"
+  ],
+  "file": "src/opcodes.c"
+ },
+ {
+  "directory": "/home/gman/GameboyEmu",
+  "arguments": [
+   "cc",
+   "-Wall",
+   "-Wextra",
+   "-pedantic",
+   "-std=c11",
+   "-Iinclude",
+   "-c",
+   "src/CBopcodes.c",
+   "-o",
+   "src/CBopcodes.o"
+  ],
+  "file": "src/CBopcodes.c"
+ }
+]
