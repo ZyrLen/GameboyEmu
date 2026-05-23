@@ -112,8 +112,7 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     char *filename = argv[1];
     if (filename) {
-      romLoaded = load_rom(filename);
-      if (romLoaded == 0) { return 0; }
+			if (!(romLoaded = load_rom(filename))) { return 0; }
       gb.pc = 0x100;
       // gb.IME = 0;
       printf("\nStarting rom:\n");
@@ -124,8 +123,7 @@ int main(int argc, char **argv) {
       exitFlag = 0;
     }
   } else {
-    printf("No rom loaded.\n");
-    printf("Executing BIOS\n");
+    printf("No rom loaded.\nExecuting BIOS\n");
     // return 0;
   }
 
