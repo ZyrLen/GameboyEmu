@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+typedef uint8_t u8;
+typedef int8_t s8;
+typedef uint16_t u16;
+typedef int16_t s16;
+
 // 0x1000 is 4 KiB
 #define MEM_SIZE (0x10000)
 #define ROM_SIZE (0x4000)
@@ -20,61 +25,61 @@
 #define IF io[0xF]
 
 typedef struct Gameboy {
-  uint16_t pc;
-  uint16_t sp;
+  u16 pc;
+  u16 sp;
 
   union {
     struct {
-      uint8_t F, A;
+      u8 F, A;
     };
-    uint16_t AF;
+    u16 AF;
   };
   union {
     struct {
-      uint8_t C, B;
+      u8 C, B;
     };
-    uint16_t BC;
+    u16 BC;
   };
   union {
     struct {
-      uint8_t E, D;
+      u8 E, D;
     };
-    uint16_t DE;
+    u16 DE;
   };
   union {
     struct {
-      uint8_t L, H;
+      u8 L, H;
     };
-    uint16_t HL;
+    u16 HL;
   };
 
-  uint8_t state; // Tracks clock cycles
-  uint8_t z;     // Zero flag
-  uint8_t n;     // Subtraction Flag (BCD)
-  uint8_t h;     // Half Carry Flag (BCD)
-  uint8_t c;     // Carry Flag
+  u8 state; // Tracks clock cycles
+  u8 z;     // Zero flag
+  u8 n;     // Subtraction Flag (BCD)
+  u8 h;     // Half Carry Flag (BCD)
+  u8 c;     // Carry Flag
 
   /* Memory Map (MMU) */
   int biosComplete;
-  uint8_t bios[0x100];
+  u8 bios[0x100];
   union {
-    uint8_t mem[0x10000];
+    u8 mem[0x10000];
     struct {
-      uint8_t ROM[2][ROM_SIZE];        // 0000 - 3FFF and 4000 - 7FFF
-      uint8_t VRAM[VRAM_SIZE];         // 8000 - 9FFF
-      uint8_t ERAM[ERAM_SIZE];         // A000 - BFFF
-      uint8_t WRAM[WRAM_SIZE];         // C000 - DFFF split into two chunks.
-      uint8_t EchoRAM[EchoRAM_SIZE];   // E000 - FDFF Echo of WRAM
-      uint8_t OAM[OAM_SIZE];           // FE00 - FE9F Object attribute memory
-      uint8_t Unusable[Unusable_SIZE]; // FEA0 - FEFF
-      uint8_t io[io_SIZE];             // FF00 - FF7F
-      uint8_t HRAM[HRAM_SIZE];         // FF80 - FFFE
-      uint8_t IE;                      // FFFF
+      u8 ROM[2][ROM_SIZE];        // 0000 - 3FFF and 4000 - 7FFF
+      u8 VRAM[VRAM_SIZE];         // 8000 - 9FFF
+      u8 ERAM[ERAM_SIZE];         // A000 - BFFF
+      u8 WRAM[WRAM_SIZE];         // C000 - DFFF split into two chunks.
+      u8 EchoRAM[EchoRAM_SIZE];   // E000 - FDFF Echo of WRAM
+      u8 OAM[OAM_SIZE];           // FE00 - FE9F Object attribute memory
+      u8 Unusable[Unusable_SIZE]; // FEA0 - FEFF
+      u8 io[io_SIZE];             // FF00 - FF7F
+      u8 HRAM[HRAM_SIZE];         // FF80 - FFFE
+      u8 IE;                      // FFFF
     };
   };
 
-  uint8_t HALT_ON;
-  uint8_t IME;
+  u8 HALT_ON;
+  u8 IME;
 } Gameboy;
 
 extern Gameboy gb;
@@ -92,6 +97,7 @@ CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
 
 void CP_i8(Gameboy *gb, void *entryptr);
 void CP_R(Gameboy *gb, void *entryptr); // compare, SUB R but doesn't update A
+void CP_HL(Gameboy *gb, void *entryptr);
 void CALL_u16(Gameboy *gb, void *entryptr);
 void LD_SP_u16(Gameboy *gb, void *entryptr);
 void LD_A_Addr(Gameboy *gb, void *entryptr);
@@ -101,6 +107,7 @@ void LD_R_Addr(Gameboy *gb, void *entryptr);
 void LD_R_AddrPlusu8(Gameboy *gb, void *entryptr);
 void LD_Addr_R(Gameboy *gb, void *entryptr);
 void LD_u16Addr_R(Gameboy *gb, void *entryptr);
+void LD_u16Addr_RR(Gameboy *gb, void *entryptr);
 void LD_AddrPlusu8_R(Gameboy *gb, void *entryptr);
 void LD_RR_u16(Gameboy *gb, void *entryptr);
 void LD_HLplus_A(Gameboy *gb, void *entryptr);

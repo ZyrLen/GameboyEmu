@@ -3,7 +3,9 @@
 #include "CBopcodes.h"
 #include "gameboy.h"
 #include "opcodes.h"
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_main.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -94,6 +96,9 @@ void gameboyInit(void) {
 /***  main  ***/
 
 int main(int argc, char **argv) {
+	// SDL_Window *window;
+	// SDL_Renderer *renderer;
+	SDL_Init(SDL_INIT_VIDEO);
 
   uint16_t executed[0x10000] = {0};
 
@@ -129,7 +134,7 @@ int main(int argc, char **argv) {
 
   // i/o[0x44]
   // CMP 0x90
-  gb.io[0x0] = 0x90;
+  //gb.io[0x0] = 0x90;
   uint64_t k = 0;
 
   gb.pc = 0;
@@ -170,5 +175,6 @@ int main(int argc, char **argv) {
     }
   }
 
+	SDL_Quit();
   return 0;
 }

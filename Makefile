@@ -1,20 +1,6 @@
 UNAME := $(shell uname)
 
-ifeq ($(UNAME), Linux)
-	SDL_LIB := lib/linux/Debian
-	LDFLAGS=-L$(SDL_LIB) -lSDL2
-endif
-
-ifeq ($(UNAME),Darwin)
-    FRAMEWORK_DIR := lib/mac
-    LDFLAGS = -F$(FRAMEWORK_DIR) -framework SDL2
-endif
-
-ifeq ($(UNAME), Windows_NT)
-	SDL_LIB := lib/windows
-	LDFLAGS=-L$(SDL_LIB) -lSDL2
-endif
-
+LDFLAGS=`pkg-config --libs sdl3`
 CFLAGS=-Wall -Wextra -pedantic -std=c11 -Iinclude
 OBJS=src/main.o src/gameboy.o src/opcodes.o src/CBopcodes.o
 

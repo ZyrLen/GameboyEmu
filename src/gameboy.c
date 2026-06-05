@@ -1,7 +1,5 @@
 #include "gameboy.h"
 #include "opcodes.h"
-#include <stdio.h>
-#include <stdlib.h>
 #define UNUSED(x) (void)(x)
 
 /*
@@ -32,6 +30,10 @@ void CP_R(Gameboy *gb, void *entryptr) {
   gb->n = 1;
   gb->h = ((A & 0xF) < (*R & 0xF));
   gb->c = (A < *R);
+}
+
+void CP_HL(Gameboy *gb, void *entryptr) {
+	s8 Z;
 }
 
 void CALL_u16(Gameboy *gb, void *entryptr) { // Pushes PC to stack, jumps to u16
@@ -98,6 +100,14 @@ void LD_u16Addr_R(Gameboy *gb, void *entryptr) {
   uint16_t addr = gb->mem[gb->pc] | (uint16_t)(gb->mem[gb->pc + 1] << 8);
   uint8_t *R = entry->arg;
   gb->mem[addr] = *R;
+  gb->pc += 2;
+}
+
+void LD_u16Addr_RR(Gameboy *gb, void *entryptr) {
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+  uint16_t addr = gb->mem[gb->pc] | (uint16_t)(gb->mem[gb->pc + 1] << 8);
+  uint16_t *RR = entry->arg;
+  gb->mem[addr] = *RR;
   gb->pc += 2;
 }
 
