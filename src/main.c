@@ -4,8 +4,11 @@
 #include "gameboy.h"
 #include "opcodes.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_init.h>
+#include <SDL3/SDL_log.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3/SDL_video.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +17,8 @@
 /***  defines ***/
 
 // resolution is 160 x 144
+#define WIDTH 160
+#define HEIGHT 144
 
 #define MAX_EXECUTIONS 10
 
@@ -76,6 +81,8 @@ int load_rom(const char *filename) {
 
 /***  fetch/decode/handle key  ***/
 
+inline void sdlRenderDisplay(SDL_Renderer *renderer, SDL_Texture *texture);
+
 /***  init  ***/
 
 void gameboyInit(void) {
@@ -96,12 +103,24 @@ void gameboyInit(void) {
 /***  main  ***/
 
 int main(int argc, char **argv) {
-	// SDL_Window *window;
-	// SDL_Renderer *renderer;
-	SDL_Init(SDL_INIT_VIDEO);
+    bool done = false;
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+        return 1;
+    }
+    SDL_Window *window = SDL_CreateWindow("IDK man", WIDTH, HEIGHT, SDL_WINDOW_VULKAN);
+    if (!window) {
+        SDL_Log("Couldn't create window: %s", SDL_GetError());
+        return 1;
+    }
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
+    if (!renderer) {
+        SDL_Log("Couldn't create renderer: %s", SDL_GetError());
+        return 1;
+    }
+		SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WIDTH, HEIGHT);
 
   uint16_t executed[0x10000] = {0};
-
   gameboyInit();
   initOpcodeTable(&gb);
   initCBOpcodeTable(&gb);
@@ -135,10 +154,17 @@ int main(int argc, char **argv) {
 
   // i/o[0x44]
   // CMP 0x90
-  //gb.io[0x0] = 0x90;
+  // gb.io[0x0] = 0x90;
   uint64_t k = 0;
 
-  while (1) {
+  while (!done) {
+		SDL_Event event;
+
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_EVENT_QUIT) {
+				done = true;
+			}
+		}
     if (!gb.HALT_ON) {
       opcodeAddress = gb.pc;
       opcode = gb.mem[gb.pc++];
@@ -172,8 +198,20 @@ int main(int argc, char **argv) {
         k++;
       }
     }
+		sdlRenderDisplay(renderer, texture);
   }
 
+	SDL_DestroyWindow(window);
 	SDL_Quit();
   return 0;
+}
+
+inline void sdlRenderDisplay(SDL_Renderer *renderer, SDL_Texture *texture) {
+	SDL_UpdateTexture(texture, NULL, gb.OAM, WIDTH * sizeof(uint32_t));
+
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+  SDL_RenderClear(renderer);
+  SDL_RenderPresent(renderer);
+
+  SDL_RenderPresent(renderer);
 }
