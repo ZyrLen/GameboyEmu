@@ -10,6 +10,8 @@ CP u8            JR cond,address    LD r,(address)    POP rr        SUB r
 CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
 */
 
+void AND(Gameboy *gb, void *entryptr) {}
+
 void CP_i8(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
   uint8_t A = gb->A;
@@ -21,7 +23,7 @@ void CP_i8(Gameboy *gb, void *entryptr) {
   gb->c = (A < n);
 }
 
-void CP_R(Gameboy *gb, void *entryptr) {
+void CP(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = entry->arg;
   uint8_t A = gb->A;
@@ -135,7 +137,17 @@ void LD_HLminus_A(Gameboy *gb, void *entryptr) {
   gb->mem[gb->HL--] = gb->A;
 }
 
-void PUSH_RR(Gameboy *gb, void *entryptr) {
+void LD_A_HLplus(Gameboy *gb, void *entryptr) {
+	gb->A = gb->mem[gb->HL++];
+}
+
+void LD_A_HLminus(Gameboy *gb, void *entryptr) {
+	gb->A = gb->mem[gb->HL--];
+}
+
+void OR(Gameboy *gb, void *entryptr) {}
+
+void PUSH(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint16_t *RR = entry->arg;
   uint8_t RR_msb = (*RR >> 8) & 0xFF;
@@ -145,7 +157,7 @@ void PUSH_RR(Gameboy *gb, void *entryptr) {
   gb->mem[gb->sp] = RR_lsb;
 }
 
-void POP_RR(Gameboy *gb, void *entryptr) {
+void POP(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint16_t *RR = entry->arg;
   uint8_t SP_lsb = gb->mem[gb->sp++];
@@ -177,7 +189,7 @@ void RLA(Gameboy *gb, void *entryptr) {
 
 // void SUB_R(Gameboy *gb, void *entryptr) {}
 
-void XOR_R(Gameboy *gb, void *entryptr) {
+void XOR(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = (uint8_t *)entry->arg;
   *R ^= *R;
@@ -192,7 +204,10 @@ void NOP(Gameboy *gb, void *entryptr) {
   UNUSED(gb);
 }
 
-// void ADD(Gameboy *gb, void *entryptr) {}
+void ADD(Gameboy *gb, void *entryptr) {}
+void ADC(Gameboy *gb, void *entryptr) {}
+void SUB(Gameboy *gb, void *entryptr) {}
+void SBC(Gameboy *gb, void *entryptr) {}
 
 void SUB_R(Gameboy *gb, void *entryptr) { // SUB A,R
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;

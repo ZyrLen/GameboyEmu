@@ -1,0 +1,16 @@
+opcodeTable[0xB0] = (OpcodeEntry){.handler = OR, .arg = &gb->B,  .mnemonic = "OR B"};
+opcodeTable[0xB1] = (OpcodeEntry){.handler = OR, .arg = &gb->C,  .mnemonic = "OR C"};
+opcodeTable[0xB2] = (OpcodeEntry){.handler = OR, .arg = &gb->D,  .mnemonic = "OR D"};
+opcodeTable[0xB3] = (OpcodeEntry){.handler = OR, .arg = &gb->E,  .mnemonic = "OR E"};
+opcodeTable[0xB4] = (OpcodeEntry){.handler = OR, .arg = &gb->H,  .mnemonic = "OR H"};
+opcodeTable[0xB5] = (OpcodeEntry){.handler = OR, .arg = &gb->L,  .mnemonic = "OR L"};
+opcodeTable[0xB6] = (OpcodeEntry){.handler = OR, .arg = &gb->HL, .mnemonic = "OR (HL)"};
+opcodeTable[0xB7] = (OpcodeEntry){.handler = OR, .arg = &gb->A,  .mnemonic = "OR A"};
+opcodeTable[0xB8] = (OpcodeEntry){.handler = CP, .arg = &gb->B,  .mnemonic = "CP B"};
+opcodeTable[0xB9] = (OpcodeEntry){.handler = CP, .arg = &gb->C,  .mnemonic = "CP C"};
+opcodeTable[0xBA] = (OpcodeEntry){.handler = CP, .arg = &gb->D,  .mnemonic = "CP D"};
+opcodeTable[0xBB] = (OpcodeEntry){.handler = CP, .arg = &gb->E,  .mnemonic = "CP E"};
+opcodeTable[0xBC] = (OpcodeEntry){.handler = CP, .arg = &gb->H,  .mnemonic = "CP H"};
+opcodeTable[0xBD] = (OpcodeEntry){.handler = CP, .arg = &gb->L,  .mnemonic = "CP L"};
+opcodeTable[0xBE] = (OpcodeEntry){.handler = CP, .arg = &gb->HL, .mnemonic = "CP (HL)"};
+opcodeTable[0xBF] = (OpcodeEntry){.handler = CP, .arg = &gb->A,  .mnemonic = "CP A"};

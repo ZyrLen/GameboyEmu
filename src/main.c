@@ -120,15 +120,16 @@ int main(int argc, char **argv) {
 			if (!(romLoaded = load_rom(filename))) { return 0; }
       gb.pc = 0x100;
       // gb.IME = 0;
-      printf("\nStarting rom:\n");
-      for (uint64_t i = 0x00; i < 2 * ROM_SIZE; i++) {
-        printf("%02X ", gb.mem[i]);
-      }
-      printf("\n\n");
-      exitFlag = 0;
+      // printf("\nStarting rom:\n");
+      // for (uint64_t i = 0x00; i < 2 * ROM_SIZE; i++) {
+      //   printf("%02X ", gb.mem[i]);
+      // }
+      // printf("\n\n");
+      // exitFlag = 0;
     }
   } else {
     printf("No rom loaded.\nExecuting BIOS\n");
+		gb.pc = 0;
     // return 0;
   }
 
@@ -136,8 +137,6 @@ int main(int argc, char **argv) {
   // CMP 0x90
   //gb.io[0x0] = 0x90;
   uint64_t k = 0;
-
-  gb.pc = 0;
 
   while (1) {
     if (!gb.HALT_ON) {
