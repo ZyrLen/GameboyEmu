@@ -10,7 +10,10 @@ CP u8            JR cond,address    LD r,(address)    POP rr        SUB r
 CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
 */
 
-void AND(Gameboy *gb, void *entryptr) {}
+void AND(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
 
 void CP_i8(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
@@ -35,7 +38,10 @@ void CP(Gameboy *gb, void *entryptr) {
 }
 
 void CP_HL(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
 	s8 Z;
+	UNUSED(Z);
 }
 
 void CALL_u16(Gameboy *gb, void *entryptr) { // Pushes PC to stack, jumps to u16
@@ -138,14 +144,19 @@ void LD_HLminus_A(Gameboy *gb, void *entryptr) {
 }
 
 void LD_A_HLplus(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
 	gb->A = gb->mem[gb->HL++];
 }
 
 void LD_A_HLminus(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
 	gb->A = gb->mem[gb->HL--];
 }
 
-void OR(Gameboy *gb, void *entryptr) {}
+void OR(Gameboy *gb, void *entryptr) {
+	UNUSED(gb);
+	UNUSED(entryptr);
+}
 
 void PUSH(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
@@ -187,8 +198,6 @@ void RLA(Gameboy *gb, void *entryptr) {
   gb->c = newCarryBit;
 }
 
-// void SUB_R(Gameboy *gb, void *entryptr) {}
-
 void XOR(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = (uint8_t *)entry->arg;
@@ -204,10 +213,22 @@ void NOP(Gameboy *gb, void *entryptr) {
   UNUSED(gb);
 }
 
-void ADD(Gameboy *gb, void *entryptr) {}
-void ADC(Gameboy *gb, void *entryptr) {}
-void SUB(Gameboy *gb, void *entryptr) {}
-void SBC(Gameboy *gb, void *entryptr) {}
+void ADD(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+void ADC(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+void SUB(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+void SBC(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
 
 void SUB_R(Gameboy *gb, void *entryptr) { // SUB A,R
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;

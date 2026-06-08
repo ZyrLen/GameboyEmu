@@ -1,5 +1,7 @@
 /***  includes  ***/
 
+#include <SDL3/SDL_render.h>
+#define _POSIX_C_SOURCE 199309L
 #include "CBopcodes.h"
 #include "gameboy.h"
 #include "opcodes.h"
@@ -13,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 /***  defines ***/
 
@@ -43,7 +46,8 @@ uint8_t DMG_BIOS[0x100] = {0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB,
   0x6E, 0x0E, 0xEC, 0xCC, 0xDD, 0xDC, 0x99, 0x9F, 0xBB, 0xB9, 0x33, 0x3E, 0x3C,
   0x42, 0xB9, 0xA5, 0xB9, 0xA5, 0x42, 0x3C, 0x21, 0x04, 0x01, 0x11, 0xA8, 0x00,
   0x1A, 0x13, 0xBE, 0x20, 0xFE, 0x23, 0x7D, 0xFE, 0x34, 0x20, 0xF5, 0x06, 0x19,
-  0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50};
+  0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50
+};
 
 /***  file i/o ***/
 
@@ -79,9 +83,9 @@ int load_rom(const char *filename) {
   return 1;
 }
 
-/***  fetch/decode/handle key  ***/
-
-inline void sdlRenderDisplay(SDL_Renderer *renderer, SDL_Texture *texture);
+/***	Rendering	 ***/
+void renderScanline(Gameboy *gb, u8 y) {
+}
 
 /***  init  ***/
 
@@ -95,12 +99,11 @@ void gameboyInit(void) {
   gb.pc = 0;
   gb.HALT_ON = 0;
 
+	memset(&gb.framebuf, 0, WIDTH * HEIGHT);
   memset(&gb.mem, 0, sizeof(gb.mem));
   memcpy(&gb.mem, &gb.bios, sizeof(gb.bios));
   gb.biosComplete = 0;
 }
-
-/***  main  ***/
 
 int main(int argc, char **argv) {
     bool done = false;
@@ -190,6 +193,17 @@ int main(int argc, char **argv) {
       entry.handler(&gb, &entry); // Executes instruction
       // if (executed[opcodeAddress] > 2) { executed[opcodeAddress] = 2; }
       executed[opcodeAddress] += 1;
+
+			for (int y = 0; y < HEIGHT; y++) {
+				renderScanline(&gb, y);
+			}
+
+			SDL_UpdateTexture(texture, NULL, gb.framebuf, WIDTH * sizeof(u32));
+			SDL_RenderClear(renderer);
+			SDL_RenderTexture(renderer, texture, NULL, NULL);
+			SDL_RenderPresent(renderer);
+			SDL_Delay(16); // ~60
+
     } else {
       if (k > 99999999) {
         printf("System is Halted\n");
@@ -198,20 +212,9 @@ int main(int argc, char **argv) {
         k++;
       }
     }
-		sdlRenderDisplay(renderer, texture);
   }
 
 	SDL_DestroyWindow(window);
 	SDL_Quit();
   return 0;
-}
-
-inline void sdlRenderDisplay(SDL_Renderer *renderer, SDL_Texture *texture) {
-	SDL_UpdateTexture(texture, NULL, gb.OAM, WIDTH * sizeof(uint32_t));
-
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-  SDL_RenderClear(renderer);
-  SDL_RenderPresent(renderer);
-
-  SDL_RenderPresent(renderer);
 }
