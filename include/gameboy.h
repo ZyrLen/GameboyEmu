@@ -84,7 +84,7 @@ typedef struct Gameboy {
   u8 IME;
 } Gameboy;
 
-extern Gameboy gb;
+// extern Gameboy gb;
 
 /* General Opcode Functions */
 /*

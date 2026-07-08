@@ -194,15 +194,15 @@ int main(int argc, char **argv) {
       // if (executed[opcodeAddress] > 2) { executed[opcodeAddress] = 2; }
       executed[opcodeAddress] += 1;
 
-			for (int y = 0; y < HEIGHT; y++) {
-				renderScanline(&gb, y);
-			}
+			// for (int y = 0; y < HEIGHT; y++) {
+			// 	renderScanline(&gb, y);
+			// }
 
-			SDL_UpdateTexture(texture, NULL, gb.framebuf, WIDTH * sizeof(u32));
-			SDL_RenderClear(renderer);
-			SDL_RenderTexture(renderer, texture, NULL, NULL);
-			SDL_RenderPresent(renderer);
-			SDL_Delay(16); // ~60
+			// SDL_UpdateTexture(texture, NULL, gb.framebuf, WIDTH * sizeof(u32));
+			// SDL_RenderClear(renderer);
+			// SDL_RenderTexture(renderer, texture, NULL, NULL);
+			// SDL_RenderPresent(renderer);
+			// SDL_Delay(16); // ~60
 
     } else {
       if (k > 99999999) {
