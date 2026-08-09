@@ -147,6 +147,11 @@ void DEC_R(Gameboy *gb, void *entryptr);
 
 void HALT(Gameboy *gb, void *entryptr);
 
+void DissableInterrupts(Gameboy *gb, void *entryptr);
+void CCF(Gameboy *gb, void *entryptr);
+void RST(Gameboy *gb, void *entryptr);
+void RST_38h(Gameboy *gb, void *entryptr);
+
 // CB:
 
 void BIT_R(Gameboy *gb, void *entryptr);

@@ -1,5 +1,6 @@
 #include "gameboy.h"
 #include "opcodes.h"
+#include <stdint.h>
 #define UNUSED(x) (void)(x)
 
 /*
@@ -266,14 +267,14 @@ void JR_Z(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
   int8_t e = gb->mem[gb->pc++];
   // e is negative if the msb = 1. (2's complement), so e is in [-128,+127]
-  if (gb->z == 1) gb->pc += e;
+  if (gb->z) gb->pc += e;
 }
 
 void JR_NZ(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
   int8_t e = gb->mem[gb->pc++];
   // e is negative if the msb = 1. (2's complement), so e is in [-128,+127]
-  if (gb->z == 0) gb->pc += e;
+  if (!gb->z) gb->pc += e;
 }
 
 void JP(Gameboy *gb, void *entryptr) {
@@ -285,13 +286,13 @@ void JP(Gameboy *gb, void *entryptr) {
 void INC_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = entry->arg;
-  if (*R + 1 == 0) {
+  if (!(uint8_t)(*R + 1)) {
     gb->z = 1;
   } else {
     gb->z = 0;
   }
   gb->n = 0;
-  uint8_t half_overflow = ((*R * 0xF) + 1 > 0xF);
+  uint8_t half_overflow = ((*R & 0xF) + 1 > 0xF);
   if (half_overflow) {
     gb->h = 1;
   } else {
@@ -311,7 +312,7 @@ void DEC_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = entry->arg;
   uint8_t value = *R;
-  uint8_t result = value - 1;
+  uint8_t result = (uint8_t)(value - 1);
   // 0bxxxx0000 Half carry only occurs if low nibble == 0
   gb->z = (result == 0);
   gb->n = 1;
@@ -322,6 +323,31 @@ void DEC_R(Gameboy *gb, void *entryptr) {
 void HALT(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
   gb->HALT_ON = 1;
+}
+
+void DissableInterrupts(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  gb->IME = 0;
+}
+
+void CCF(Gameboy *gb, void *entryptr) { // Complement Carry Flag
+  UNUSED(entryptr);
+  gb->n = 0;
+  gb->h = 0;
+  gb->c ^= 1;
+}
+
+void RST(Gameboy *gb, void *entryptr) {
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+  gb->mem[gb->sp++] = gb->pc & 0xF;
+  gb->mem[gb->sp++] = (gb->pc >> 8);
+  gb->pc = entry->address;
+}
+
+void RST_38h(Gameboy *gb, void *entryptr) {
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+  entry->address=0x38;
+  RST(gb, entryptr);
 }
 
 // CB

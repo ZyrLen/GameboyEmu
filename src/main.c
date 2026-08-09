@@ -12,6 +12,7 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_video.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,6 +73,7 @@ int load_rom(const char *filename) {
     return 0;
   }
 
+  printf("rom_size = %ld\n", rom_size);
   size_t bytes_read = fread(&gb.mem[0], 1, rom_size, rom);
   if (bytes_read != (size_t)rom_size) {
     fprintf(stderr, "Failed to read full ROM\n");
@@ -84,8 +86,8 @@ int load_rom(const char *filename) {
 }
 
 /***	Rendering	 ***/
-void renderScanline(Gameboy *gb, u8 y) {
-}
+// void renderScanline(Gameboy *gb, u8 y) {
+// }
 
 /***  init  ***/
 
@@ -99,9 +101,9 @@ void gameboyInit(void) {
   gb.pc = 0;
   gb.HALT_ON = 0;
 
-	memset(&gb.framebuf, 0, WIDTH * HEIGHT);
-  memset(&gb.mem, 0, sizeof(gb.mem));
-  memcpy(&gb.mem, &gb.bios, sizeof(gb.bios));
+	memset(gb.framebuf, 0, WIDTH * HEIGHT);
+  memset(gb.mem, 0, sizeof(gb.mem));
+  memcpy(gb.mem, gb.bios, sizeof(gb.bios));
   gb.biosComplete = 0;
 }
 
@@ -121,7 +123,7 @@ int main(int argc, char **argv) {
         SDL_Log("Couldn't create renderer: %s", SDL_GetError());
         return 1;
     }
-		SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WIDTH, HEIGHT);
+		// SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WIDTH, HEIGHT);
 
   uint16_t executed[0x10000] = {0};
   gameboyInit();
@@ -139,8 +141,45 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     char *filename = argv[1];
     if (filename) {
-			if (!(romLoaded = load_rom(filename))) { return 0; }
+			if (!(romLoaded = load_rom(filename))) { return 1; }
       gb.pc = 0x100;
+      gb.AF = 0x01B0;
+      gb.BC = 0x0013;
+      gb.DE = 0x00D8;
+      gb.HL = 0x014D;
+      gb.sp = 0xFFFE;
+      gb.mem[0xFF05] = 0x00;
+      gb.mem[0xFF06] = 0x00;
+      gb.mem[0xFF07] = 0x00;
+      gb.mem[0xFF10] = 0x80;
+      gb.mem[0xFF11] = 0xBF;
+      gb.mem[0xFF12] = 0xF3;
+      gb.mem[0xFF14] = 0xBF;
+      gb.mem[0xFF16] = 0x3F;
+      gb.mem[0xFF17] = 0x00;
+      gb.mem[0xFF19] = 0xBF;
+      gb.mem[0xFF1A] = 0x07F;
+      gb.mem[0xFF1B] = 0x0FF;
+      gb.mem[0xFF1C] = 0x9F;
+      gb.mem[0xFF1E] = 0xBF;
+      gb.mem[0xFF20] = 0xFF;
+      gb.mem[0xFF21] = 0x00;
+      gb.mem[0xFF22] = 0x00;
+      gb.mem[0xFF23] = 0xBF;
+      gb.mem[0xFF24] = 0x77;
+      gb.mem[0xFF25] = 0xF3;
+      gb.mem[0xFF26] = 0xF1;//-GB, FO-SGB
+      gb.mem[0xFF40] = 0x91;
+      gb.mem[0xFF42] = 0x00;
+      gb.mem[0xFF43] = 0x00;
+      gb.mem[0xFF45] = 0x00;
+      gb.mem[0xFF47] = 0xFC;
+      gb.mem[0xFF48] = 0xFF;
+      gb.mem[0xFF49] = 0xFF;
+      gb.mem[0xFF4A] = 0x00;
+      gb.mem[0xFF4B] = 0x00;
+      gb.mem[0xFFFF] = 0x00;
+      // gb.pc = 0x100;
       // gb.IME = 0;
       // printf("\nStarting rom:\n");
       // for (uint64_t i = 0x00; i < 2 * ROM_SIZE; i++) {
@@ -150,6 +189,7 @@ int main(int argc, char **argv) {
       // exitFlag = 0;
     }
   } else {
+    // Boot rom is not quite loaded right for now.
     printf("No rom loaded.\nExecuting BIOS\n");
 		gb.pc = 0;
     // return 0;
@@ -179,20 +219,17 @@ int main(int argc, char **argv) {
         entry = opcodeTable[opcode];
       }
 
-      if (entry.mnemonic) {
-        printMessage = entry.mnemonic;
-      } else {
-        printMessage = Unimplemented;
-        exitFlag = 1;
-      }
-      if (executed[opcodeAddress] < 2) {
+      if (!entry.mnemonic) exitFlag = 1;
+      printMessage = (entry.mnemonic) ? entry.mnemonic : Unimplemented;
+
+      if (executed[opcodeAddress]++ < 2 && strcmp("NOP", printMessage)) {
         printf(
           "0x%02X  |  %-15s    $%04X\n", opcode, printMessage, opcodeAddress);
       }
       if (exitFlag) break;
       entry.handler(&gb, &entry); // Executes instruction
-      // if (executed[opcodeAddress] > 2) { executed[opcodeAddress] = 2; }
-      executed[opcodeAddress] += 1;
+      if (executed[opcodeAddress] > 2) { executed[opcodeAddress] = 2; }
+      // executed[opcodeAddress] += 1;
 
 			// for (int y = 0; y < HEIGHT; y++) {
 			// 	renderScanline(&gb, y);
@@ -216,5 +253,13 @@ int main(int argc, char **argv) {
 
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+  // printf("IO: \n");
+  // for (int i=0; i<16; ++i) {
+  //   u16 addr = (u16)(gb.io-gb.mem);
+  //   printf("0x%02X:\t", addr + 8*i);
+  //   for (int j=0; j<8; ++j)
+  //     printf("%02X ", gb.io[8*i+j]);
+  //   putchar('\n');
+  // }
   return 0;
 }

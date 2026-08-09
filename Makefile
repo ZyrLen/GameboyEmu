@@ -1,7 +1,7 @@
 UNAME := $(shell uname)
 
 LDFLAGS=`pkg-config --libs sdl3`
-CFLAGS=-Wall -Wextra -pedantic -std=c11 -Iinclude
+CFLAGS=-g -Wall -Wextra -pedantic -std=c11 -Iinclude
 OBJS=src/main.o src/gameboy.o src/opcodes.o src/CBopcodes.o
 
 TARGET=main
