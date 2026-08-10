@@ -16,8 +16,8 @@ typedef struct {
   struct {
     uint8_t nbit;
   } BitArgs;
-  uint16_t address;
-
+  uint16_t *address; // If it wasn't a pointer, the value does not change after
+                     // start of program
 } OpcodeEntry;
 
 extern OpcodeEntry opcodeTable[256];

@@ -25,8 +25,12 @@ typedef uint32_t u32;
 #define CartHeaderSize 0x50
 #define IF io[0xF]
 
+struct PPU {
+  u32 framebuf[144][160];
+  u8 tilemap[2][32*32];
+};
+
 typedef struct Gameboy {
-	u32 framebuf[144][160];
   u16 pc;
   u16 sp;
 
@@ -82,6 +86,7 @@ typedef struct Gameboy {
 
   u8 HALT_ON;
   u8 IME;
+  struct PPU ppu;
 } Gameboy;
 
 // extern Gameboy gb;
