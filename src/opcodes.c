@@ -440,11 +440,21 @@ opcodeTable[0xBF] = (OpcodeEntry){.handler = CP, .arg = &gb->A,  .mnemonic = "CP
     .mcycles = 3,
     .mnemonic = "LD (FF00+u8),A"};
 
+  opcodeTable[0xE1] = (OpcodeEntry){.handler = PUSH,
+    .arg = &gb->HL,
+    .mcycles = 3,
+    .mnemonic = "POP HL"};
+
   opcodeTable[0xE2] = (OpcodeEntry){.handler = LD_Addr_R,
     .arg = &gb->A,
     .address = (uint16_t *)&gb->C,
     .mcycles = 2,
     .mnemonic = "LD (FF00+C),A"};
+
+  opcodeTable[0xE5] = (OpcodeEntry){.handler = PUSH,
+    .arg = &gb->HL,
+    .mcycles = 4,
+    .mnemonic = "PUSH HL"};
 
   opcodeTable[0xEA] = (OpcodeEntry){.handler = LD_u16Addr_R,
     .arg = &gb->A,
