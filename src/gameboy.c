@@ -1,5 +1,6 @@
 #include "gameboy.h"
 #include "opcodes.h"
+#include <stdint.h>
 #include <stdio.h>
 #define UNUSED(x) (void)(x)
 #define Z_BIT 7
@@ -26,7 +27,14 @@ static void SET_FLAGS(Gameboy *gb) {
 
 void AND(Gameboy *gb, void *entryptr) {
 	UNUSED(entryptr);
-	UNUSED(gb);
+  uint8_t n = gb->mem[gb->pc++];
+  uint8_t value = gb->A & n;
+  gb->A = value;
+  gb->z = (!value);
+  gb->n = 0;
+  gb->h = 1;
+  gb->c = 0;
+  SET_FLAGS(gb);
 }
 
 void CP_i8(Gameboy *gb, void *entryptr) {
@@ -82,7 +90,13 @@ void LD_SP_u16(Gameboy *gb, void *entryptr) {
   gb->pc += 2;
 }
 
-// void LD_A_Addr(Gameboy *gb, void *entryptr) {}
+void LD_A_Addr(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint8_t low = gb->mem[gb->pc++];
+  uint8_t high = gb->mem[gb->pc++];
+  uint16_t addr = ((uint8_t)high << 8) | low;
+  gb->A = gb->mem[addr];
+}
 
 void LD_R_R(Gameboy *gb, void *entryptr) {
   UNUSED(gb);
@@ -177,7 +191,15 @@ void LD_A_HLminus(Gameboy *gb, void *entryptr) {
 
 void OR(Gameboy *gb, void *entryptr) {
 	UNUSED(gb);
-	UNUSED(entryptr);
+	OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+  uint8_t *R = entry->arg;
+  uint8_t result = gb->A | *R;
+  gb->A = result;
+  gb->z = (!result);
+  gb->n = 0;
+  gb->h = 0;
+  gb->c = 0;
+  SET_FLAGS(gb);
 }
 
 void PUSH(Gameboy *gb, void *entryptr) {
@@ -193,9 +215,9 @@ void PUSH(Gameboy *gb, void *entryptr) {
 void POP(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint16_t *RR = entry->arg;
-  uint8_t SP_lsb = gb->mem[gb->sp++];
-  uint8_t SP_msb = gb->mem[gb->sp++];
-  *RR = ((uint16_t)SP_msb << 8) | SP_lsb;
+  uint8_t SP_low = gb->mem[gb->sp++];
+  uint8_t SP_high = gb->mem[gb->sp++];
+  *RR = (SP_high << 8) | SP_low;
 }
 
 void RET(Gameboy *gb, void *entryptr) {

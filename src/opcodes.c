@@ -440,7 +440,7 @@ opcodeTable[0xBF] = (OpcodeEntry){.handler = CP, .arg = &gb->A,  .mnemonic = "CP
     .mcycles = 3,
     .mnemonic = "LD (FF00+u8),A"};
 
-  opcodeTable[0xE1] = (OpcodeEntry){.handler = PUSH,
+  opcodeTable[0xE1] = (OpcodeEntry){.handler = POP,
     .arg = &gb->HL,
     .mcycles = 3,
     .mnemonic = "POP HL"};
@@ -456,6 +456,9 @@ opcodeTable[0xBF] = (OpcodeEntry){.handler = CP, .arg = &gb->A,  .mnemonic = "CP
     .mcycles = 4,
     .mnemonic = "PUSH HL"};
 
+  opcodeTable[0xE6] = (OpcodeEntry){.handler = AND,
+    .mcycles = 2, .mnemonic = "AND A,u8"};
+
   opcodeTable[0xEA] = (OpcodeEntry){.handler = LD_u16Addr_R,
     .arg = &gb->A,
     .mcycles = 4,
@@ -466,8 +469,21 @@ opcodeTable[0xBF] = (OpcodeEntry){.handler = CP, .arg = &gb->A,  .mnemonic = "CP
     .mcycles = 3,
     .mnemonic = "LD A,(FF00+u8)"};
 
+  opcodeTable[0xF1] = (OpcodeEntry){.handler = POP,
+    .arg = &gb->AF,
+    .mcycles = 3,
+    .mnemonic = "POP AF"};
+
   opcodeTable[0xF3] = (OpcodeEntry){.handler = DissableInterrupts, 
     .mcycles = 1, .mnemonic ="DI"};
+
+  opcodeTable[0xF5] = (OpcodeEntry){.handler = PUSH,
+    .arg = &gb->AF,
+    .mcycles = 4,
+    .mnemonic = "PUSH AF"};
+
+  opcodeTable[0xFA] =(OpcodeEntry){.handler = LD_A_Addr,
+    .mcycles = 4, .mnemonic = "LD A,(u16)"};
 
   opcodeTable[0xFE] =
     (OpcodeEntry){.handler = CP_i8, .mcycles = 2, .mnemonic = "CP A,i8"};
