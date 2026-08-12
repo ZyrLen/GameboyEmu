@@ -103,13 +103,22 @@ CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
 // Right half of list for now
 
 void ADD(Gameboy *gb, void *entryptr);
+void ADD_HL(Gameboy *gb, void *entryptr);
+void ADD_u8(Gameboy *gb, void *entryptr);
 void ADC(Gameboy *gb, void *entryptr);
-void AND(Gameboy *gb, void *entryptr);
+void ADC_HL(Gameboy *gb, void *entryptr);
+void ADC_u8(Gameboy *gb, void *entryptr);
 void SUB(Gameboy *gb, void *entryptr);
+void SUB_HL(Gameboy *gb, void *entryptr);
+void SUB_u8(Gameboy *gb, void *entryptr);
+void AND(Gameboy *gb, void *entryptr);
 void SBC(Gameboy *gb, void *entryptr);
+void SBC_HL(Gameboy *gb, void *entryptr);
+void SBC_u8(Gameboy *gb, void *entryptr);
 void CP_i8(Gameboy *gb, void *entryptr);
 void CP(Gameboy *gb, void *entryptr); // compare, SUB R but doesn't update A
 void CALL_u16(Gameboy *gb, void *entryptr);
+void CALL_NZ_u16(Gameboy *gb, void *entryptr);
 void LD_SP_u16(Gameboy *gb, void *entryptr);
 void LD_A_Addr(Gameboy *gb, void *entryptr);
 void LD_R_R(Gameboy *gb, void *entryptr);
@@ -132,13 +141,10 @@ void RET(Gameboy *gb, void *entryptr);
 void RLA(Gameboy *gb, void *entryptr);
 void RL_R(Gameboy *gb, void *entryptr); // Rotate left
 
-void SUB_R(Gameboy *gb, void *entryptr);
-void SUB_R_HL(Gameboy *gb, void *entryptr);
-void SUB_R_u8(Gameboy *gb, void *entryptr);
-
 void NOP(Gameboy *gb, void *entryptr);
 
 void XOR(Gameboy *gb, void *entryptr);
+void XOR_HL(Gameboy *gb, void *entryptr);
 void XOR_d8(Gameboy *gb, void *entryptr);
 void JR_NZ(Gameboy *gb, void *entryptr);
 void JR_NC(Gameboy *gb, void *entryptr);
@@ -146,6 +152,8 @@ void JR_Z(Gameboy *gb, void *entryptr);
 void JR_C(Gameboy *gb, void *entryptr);
 void JR(Gameboy *gb, void *entryptr);
 void JP(Gameboy *gb, void *entryptr);
+void JP_Z(Gameboy *gb, void *entryptr);
+void JP_NZ(Gameboy *gb, void *entryptr);
 void INC_R(Gameboy *gb, void *entryptr);
 void INC_RR(Gameboy *gb, void *entryptr);
 void DEC_R(Gameboy *gb, void *entryptr);

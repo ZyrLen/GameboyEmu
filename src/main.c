@@ -1,15 +1,15 @@
-#include <SDL3/SDL_hints.h>
-#include <SDL3/SDL_render.h>
 #define _POSIX_C_SOURCE 199309L
 #include "CBopcodes.h"
 #include "gameboy.h"
 #include "opcodes.h"
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_error.h>
-#include <SDL3/SDL_init.h>
-#include <SDL3/SDL_log.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_hints.h>
+// #include <SDL3/SDL_render.h>
+// #include <SDL3/SDL_error.h>
+// #include <SDL3/SDL_init.h>
+// #include <SDL3/SDL_log.h>
+// #include <SDL3/SDL_video.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -21,7 +21,6 @@
 #define WIDTH 160
 #define HEIGHT 144
 #define HAlT_EXIT_CODE 200
-
 #define MAX_EXECUTIONS 2
 
 Gameboy gb;
@@ -195,6 +194,10 @@ int main(int argc, char **argv) {
                gb.D, gb.E, gb.H, gb.L, gb.sp, gb.pc, 
                gb.mem[gb.pc], gb.mem[gb.pc+1], gb.mem[gb.pc+2], gb.mem[gb.pc+3]);
 
+  uint8_t dataRegister = gb.mem[0xFF01];
+  uint8_t controlRegister = gb.mem[0xFF02];
+  printf("0xFF01: %02X\n", dataRegister);
+  printf("0xFF02: %02X\n", controlRegister);
   while (!done) {
 		SDL_Event event;
 
@@ -203,7 +206,17 @@ int main(int argc, char **argv) {
 				done = true;
 			}
 		}
+
     decodeAndExecute(&gb, &mcycles, executed);
+
+    if (dataRegister != gb.mem[0xFF01]) {
+      dataRegister = gb.mem[0xFF01];
+      printf("0xFF01: %02X\n", dataRegister);
+    }
+    if (controlRegister != gb.mem[0xFF02]) {
+      controlRegister = gb.mem[0xFF02];
+      printf("0xFF01: %02X\n", controlRegister);
+    }
     fprintf(f, "A:%02X F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X"
                " PC:%04X PCMEM:%02X,%02X,%02X,%02X\n", gb.A, gb.F, gb.B, gb.C,
                gb.D, gb.E, gb.H, gb.L, gb.sp, gb.pc, 
@@ -318,14 +331,17 @@ void decodeAndExecute(Gameboy *gb, unsigned long long *mcycles, uint16_t
   uint8_t opcode;
   uint16_t opcodeAddress;
   char Unimplemented[16] = "Not implemented";
+  char CBUnimplemented[19] = "CB Not implemented";
   const char *printMessage;
   OpcodeEntry entry;
   int exitFlag = 0;
+  int isCB = 0;
 
   opcodeAddress = gb->pc;
   opcode = gb->mem[gb->pc++];
 
   if (opcode == 0xCB) {
+    isCB = 1;
     opcode = gb->mem[gb->pc++];
     entry = CBopcodeTable[opcode];
   } else {
@@ -334,7 +350,7 @@ void decodeAndExecute(Gameboy *gb, unsigned long long *mcycles, uint16_t
 
   if (!entry.mnemonic) 
     exitFlag = 1;
-  printMessage = (entry.mnemonic) ? entry.mnemonic : Unimplemented;
+  printMessage = (entry.mnemonic) ? entry.mnemonic : (isCB ? CBUnimplemented : Unimplemented);
 
   if (executed[opcodeAddress]++ < MAX_EXECUTIONS) {
     printf("0x%02X  |  %-15s    $%04X\n", opcode, printMessage, opcodeAddress);

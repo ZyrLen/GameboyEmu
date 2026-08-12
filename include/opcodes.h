@@ -10,7 +10,7 @@ typedef struct {
   void (*handler)(Gameboy *gb, void *arg);
   const char *mnemonic;
   uint8_t mcycles;
-  uint8_t mcyclesTrue;
+  uint8_t mcyclesTrue; // If condition is true
   uint8_t *R1; // Used for Two Register instructions
   uint8_t *R2; // Used for Two Register instructions
   struct {

@@ -83,6 +83,20 @@ void CALL_u16(Gameboy *gb, void *entryptr) { // Pushes PC to stack, jumps to u16
   // printf("PC = %04X\n", gb->pc);
 }
 
+void CALL_NZ_u16(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint16_t nn = gb->mem[gb->pc] | (gb->mem[gb->pc + 1] << 8);
+  gb->pc += 2;
+  uint8_t pc_lsb = gb->pc & 0xFF;
+  uint8_t pc_msb = (gb->pc >> 8) & 0xFF;
+  if (!gb->z) {
+    gb->sp--;
+    gb->mem[gb->sp--] = pc_msb;
+    gb->mem[gb->sp] = pc_lsb;
+    gb->pc = nn;
+  }
+}
+
 void LD_SP_u16(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint16_t *SP = (uint16_t *)entry->arg;
@@ -246,8 +260,22 @@ void RLA(Gameboy *gb, void *entryptr) {
 void XOR(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = (uint8_t *)entry->arg;
-  *R ^= *R;
-  gb->z = 1;
+  uint8_t value = gb->A ^ *R;
+  gb->A = value;
+  gb->z = (!value);
+  gb->n = 0;
+  gb->h = 0;
+  gb->c = 0;
+  SET_FLAGS(gb);
+}
+
+void XOR_HL(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint16_t addr = gb->HL;
+  uint8_t n = gb->mem[addr];
+  uint8_t value = gb->A ^ n;
+  gb->A = value;
+  gb->z = (!value);
   gb->n = 0;
   gb->h = 0;
   gb->c = 0;
@@ -260,23 +288,52 @@ void NOP(Gameboy *gb, void *entryptr) {
 }
 
 void ADD(Gameboy *gb, void *entryptr) {
-	UNUSED(entryptr);
-	UNUSED(gb);
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+  uint8_t *R = entry->arg;
+  uint8_t old = gb->A;
+  uint8_t result = gb->A + *R;
+  gb->A = result;
+  gb->z = (!result);
+  gb->n = 0;
+  gb->h = ((old & 0xF) + (*R & 0xF) > 0xF);
+  gb->c = ((uint16_t)(*R + old) > 0xFF);
+  SET_FLAGS(gb);
 }
-void ADC(Gameboy *gb, void *entryptr) {
-	UNUSED(entryptr);
-	UNUSED(gb);
-}
-void SUB(Gameboy *gb, void *entryptr) {
-	UNUSED(entryptr);
-	UNUSED(gb);
-}
-void SBC(Gameboy *gb, void *entryptr) {
+
+void ADD_HL(Gameboy *gb, void *entryptr) {
 	UNUSED(entryptr);
 	UNUSED(gb);
 }
 
-void SUB_R(Gameboy *gb, void *entryptr) { // SUB A,R
+void ADD_u8(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint8_t n = gb->mem[gb->pc++];
+  uint8_t old = gb->A;
+  uint8_t result = gb->A + n;
+  gb->A = result;
+  gb->z = (!result);
+  gb->n = 0;
+  gb->h = ((old & 0xF) + (n & 0xF) > 0xF);
+  gb->c = ((uint16_t)(n+old) > 0xFF);
+  SET_FLAGS(gb);
+}
+
+void ADC(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+
+void ADC_HL(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+
+void ADC_u8(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+
+void SUB(Gameboy *gb, void *entryptr) { // SUB A,R
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = entry->arg;
   uint8_t value = *R;
@@ -290,17 +347,39 @@ void SUB_R(Gameboy *gb, void *entryptr) { // SUB A,R
   SET_FLAGS(gb);
 }
 
-/*
-void SUB_R_HL(Gameboy *gb, void *entryptr) {
-  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+void SUB_HL(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  UNUSED(gb);
+  // OpcodeEntry *entry = (OpcodeEntry *)entryptr;
 }
 
-void SUB_R_u8(Gameboy *gb, void *entryptr) {
-  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+void SUB_u8(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint8_t n = gb->mem[gb->pc++];
+  uint8_t old = gb->A;
+  uint8_t result = gb->A - n;
+  gb->A = result;
+  gb->z = (!result);
+  gb->n = 1;
+  gb->h = ((old & 0xF) < (n & 0xF));
+  gb->c = (n > old);
+  SET_FLAGS(gb);
 }
-*/
 
-// void XOR(Gameboy *gb, void *entryptr) {}
+void SBC(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+
+void SBC_HL(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
+
+void SBC_u8(Gameboy *gb, void *entryptr) {
+	UNUSED(entryptr);
+	UNUSED(gb);
+}
 
 void JR(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
@@ -323,10 +402,31 @@ void JR_NZ(Gameboy *gb, void *entryptr) {
   if (!gb->z) gb->pc += e;
 }
 
+void JR_C(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  int8_t e = gb->mem[gb->pc++];
+  // e is negative if the msb = 1. (2's complement), so e is in [-128,+127]
+  if (gb->c) gb->pc += e;
+}
+
 void JP(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
   uint16_t addr = ((uint16_t)gb->mem[gb->pc + 1] << 8) | gb->mem[gb->pc];
   gb->pc = addr;
+}
+
+void JP_NZ(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint16_t addr = ((uint16_t)gb->mem[gb->pc + 1] << 8) | gb->mem[gb->pc];
+  if (!gb->z)
+    gb->pc = addr;
+}
+
+void JP_Z(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint16_t addr = ((uint16_t)gb->mem[gb->pc + 1] << 8) | gb->mem[gb->pc];
+  if (gb->z)
+    gb->pc = addr;
 }
 
 void INC_R(Gameboy *gb, void *entryptr) {
