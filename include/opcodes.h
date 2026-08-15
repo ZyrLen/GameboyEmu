@@ -15,6 +15,7 @@ typedef struct {
   uint8_t *R2; // Used for Two Register instructions
   struct {
     uint8_t nbit;
+    uint8_t isHL;
   } BitArgs;
   uint16_t *address; // If it wasn't a pointer, the value does not change after
                      // start of program

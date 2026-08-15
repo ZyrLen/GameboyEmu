@@ -132,6 +132,7 @@ void LD_AddrPlusu8_R(Gameboy *gb, void *entryptr);
 void LD_RR_u16(Gameboy *gb, void *entryptr);
 void LD_HLplus_A(Gameboy *gb, void *entryptr);
 void LD_HLminus_A(Gameboy *gb, void *entryptr);
+void LD_HL_u8(Gameboy *gb, void *entryptr);
 void LD_A_HLplus(Gameboy *gb, void *entryptr);
 void LD_A_HLminus(Gameboy *gb, void *entryptr);
 void OR(Gameboy *gb, void *entryptr);
@@ -156,18 +157,28 @@ void JP_Z(Gameboy *gb, void *entryptr);
 void JP_NZ(Gameboy *gb, void *entryptr);
 void INC_R(Gameboy *gb, void *entryptr);
 void INC_RR(Gameboy *gb, void *entryptr);
+void INC_HL(Gameboy *gb, void *entryptr);
 void DEC_R(Gameboy *gb, void *entryptr);
+void DEC_RR(Gameboy *gb, void *entryptr);
+void DEC_HL(Gameboy *gb, void *entryptr);
 
 void HALT(Gameboy *gb, void *entryptr);
 
 void DissableInterrupts(Gameboy *gb, void *entryptr);
 void CCF(Gameboy *gb, void *entryptr);
+void SCF(Gameboy *gb, void *entryptr);
+void DAA(Gameboy *gb, void *entryptr);
 void RST(Gameboy *gb, void *entryptr);
 void RST_38h(Gameboy *gb, void *entryptr);
 
 // CB:
 
+void RRC(Gameboy *gb, void *entryptr);
+void RLC(Gameboy *gb, void *entryptr);
 void BIT_R(Gameboy *gb, void *entryptr);
 void BIT_RR(Gameboy *gb, void *entryptr);
+void SRL_R(Gameboy *gb, void *entryptr);
+void RR_R(Gameboy *gb, void *entryptr);
+void RL_R(Gameboy *gb, void *entryptr);
 
 #endif
