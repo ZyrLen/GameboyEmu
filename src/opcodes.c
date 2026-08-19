@@ -55,7 +55,7 @@ void initOpcodeTable(Gameboy *gb) {
   opcodeTable[0x1C] = (OE){.handler = INC_R, .arg = &gb->E, .mcycles = 1, .mnemonic = "INC E"};
   opcodeTable[0x1D] = (OE){.handler = DEC_R, .arg = &gb->E, .mcycles = 1, .mnemonic = "DEC E"};
   opcodeTable[0x1E] = (OE){.handler = LD_R_u8, .arg = &gb->E, .mcycles = 2, .mnemonic = "LD E,u8"};
-  // opcodeTable[0x1F] = (OE){};
+  opcodeTable[0x1F] = (OE){.handler = RRA, .mcycles = 1, .mnemonic = "RRA"};
 
   opcodeTable[0x20] = (OE){.handler = JR_NZ, .mcyclesTrue = 3, .mcycles = 2, .mnemonic = "JR NZ,i8", .arg = NULL};
   opcodeTable[0x21] = (OE){.handler = LD_RR_u16, .arg = &gb->HL, .mcycles = 3, .mnemonic = "LD HL,u16"};
@@ -251,7 +251,9 @@ void initOpcodeTable(Gameboy *gb) {
   opcodeTable[0xC9] =(OE){.handler = RET, .mcycles = 4, .mnemonic = "RET"};
   opcodeTable[0xCA] =(OE){.handler = JP_Z, .mcycles = 3, .mcyclesTrue = 4, .mnemonic = "JP Z,u16"};
   opcodeTable[0xCD] =(OE){.handler = CALL_u16, .mcycles = 6, .mnemonic = "CALL u16"};
+  opcodeTable[0xCE] =(OE){.handler = ADC_u8, .mcycles = 2, .mnemonic = "ADC A,u8"};
 
+  opcodeTable[0xD1] = (OE){.handler = POP, .arg = &gb->DE, .mcycles = 3, .mnemonic = "POP DE"};
   opcodeTable[0xD5] = (OE){.handler = PUSH, 
     .arg = &gb->DE, .mcycles = 4, .mnemonic = "PUSH DE"};
 
@@ -284,6 +286,8 @@ void initOpcodeTable(Gameboy *gb) {
     .arg = &gb->A,
     .mcycles = 4,
     .mnemonic = "LD (u16),A"};
+
+  opcodeTable[0xEE] = (OE){.handler = XOR_u8, .mcycles = 2, .mnemonic = "XOR A,u8"};
 
   opcodeTable[0xF0] = (OE){.handler = LD_R_AddrPlusu8,
     .arg = &gb->A,

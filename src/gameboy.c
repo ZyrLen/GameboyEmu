@@ -266,9 +266,21 @@ void RLA(Gameboy *gb, void *entryptr) {
 void XOR(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = (uint8_t *)entry->arg;
-  uint8_t value = gb->A ^ *R;
-  gb->A = value;
-  gb->z = (!value);
+  uint8_t result = gb->A ^ *R;
+  gb->A = result;
+  gb->z = (!result);
+  gb->n = 0;
+  gb->h = 0;
+  gb->c = 0;
+  SET_FLAGS(gb);
+}
+
+void XOR_u8(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint8_t n = gb->mem[gb->pc++];
+  uint8_t result = gb->A ^ n;
+  gb->A = result;
+  gb->z = (!result);
   gb->n = 0;
   gb->h = 0;
   gb->c = 0;
@@ -279,9 +291,9 @@ void XOR_HL(Gameboy *gb, void *entryptr) {
   UNUSED(entryptr);
   uint16_t addr = gb->HL;
   uint8_t n = gb->mem[addr];
-  uint8_t value = gb->A ^ n;
-  gb->A = value;
-  gb->z = (!value);
+  uint8_t result = gb->A ^ n;
+  gb->A = result;
+  gb->z = (!result);
   gb->n = 0;
   gb->h = 0;
   gb->c = 0;
@@ -332,18 +344,42 @@ void ADD_u8(Gameboy *gb, void *entryptr) {
 }
 
 void ADC(Gameboy *gb, void *entryptr) {
-	UNUSED(entryptr);
-	UNUSED(gb);
+  OpcodeEntry *entry = (OpcodeEntry *)entryptr;
+  uint8_t *R = entry->arg;
+  uint16_t result = gb->A + *R + gb->c;
+  uint8_t old = gb->A;
+  gb->A = (uint8_t)result;
+  gb->z = (!(uint8_t)result);
+  gb->n = 0;
+  gb->h = ((old & 0xF) + (*R & 0xF) > 0xF);
+  gb->c = (result > 0xFF);
+  SET_FLAGS(gb);
 }
 
 void ADC_HL(Gameboy *gb, void *entryptr) {
-	UNUSED(entryptr);
-	UNUSED(gb);
+  UNUSED(entryptr);
+  uint8_t n = gb->mem[gb->HL];
+  uint16_t result = gb->A + n + gb->c;
+  uint8_t old = gb->A;
+  gb->A = (uint8_t)result;
+  gb->z = (!(uint8_t)result);
+  gb->n = 0;
+  gb->h = ((old & 0xF) + (n & 0xF) > 0xF);
+  gb->c = (result > 0xFF);
+  SET_FLAGS(gb);
 }
 
 void ADC_u8(Gameboy *gb, void *entryptr) {
-	UNUSED(entryptr);
-	UNUSED(gb);
+  UNUSED(entryptr);
+  uint8_t n = gb->mem[gb->pc++];
+  uint16_t result = gb->A + n + gb->c;
+  uint8_t old = gb->A;
+  gb->A = (uint8_t)result;
+  gb->z = (!(uint8_t)result);
+  gb->n = 0;
+  gb->h = ((old & 0xF) + (n & 0xF) > 0xF);
+  gb->c = (result > 0xFF);
+  SET_FLAGS(gb);
 }
 
 void SUB(Gameboy *gb, void *entryptr) { // SUB A,R
@@ -553,6 +589,20 @@ void RST_38h(Gameboy *gb, void *entryptr) {
   RST(gb, entryptr);
 }
 
+void RRA(Gameboy *gb, void *entryptr) {
+  UNUSED(entryptr);
+  uint8_t b0 = gb->A & 1;
+  gb->A = (gb->A >> 1) & ~(1<<7);
+  gb->A |= (gb->c << 7);
+
+  gb->z = 0;
+  gb->n = 0;
+  gb->h = 0;
+  gb->c = b0;
+  SET_FLAGS(gb);
+}
+
+
 // CB
 void RRC(Gameboy *gb, void *entryptr) {
   UNUSED(gb);
@@ -604,14 +654,15 @@ void RL_R(Gameboy *gb, void *entryptr) {
 void RR_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;
   uint8_t *R = entry->arg;
-  uint8_t R0 = (*R >> 0) & 1;
-  *R = (*R >> 1) | (gb->c << 7);
+  uint8_t R0 = *R & 1;
+  *R = (*R >> 1);
+  *R |= (gb->c << 7);
   gb->z = !(*R);
   gb->n = 0;
   gb->h = 0;
   gb->c = R0;
+  SET_FLAGS(gb);
 }
-
 
 void SRL_R(Gameboy *gb, void *entryptr) {
   OpcodeEntry *entry = (OpcodeEntry *)entryptr;

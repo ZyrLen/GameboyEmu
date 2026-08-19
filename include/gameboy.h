@@ -145,8 +145,8 @@ void RL_R(Gameboy *gb, void *entryptr); // Rotate left
 void NOP(Gameboy *gb, void *entryptr);
 
 void XOR(Gameboy *gb, void *entryptr);
+void XOR_u8(Gameboy *gb, void *entryptr);
 void XOR_HL(Gameboy *gb, void *entryptr);
-void XOR_d8(Gameboy *gb, void *entryptr);
 void JR_NZ(Gameboy *gb, void *entryptr);
 void JR_NC(Gameboy *gb, void *entryptr);
 void JR_Z(Gameboy *gb, void *entryptr);
@@ -168,6 +168,7 @@ void DissableInterrupts(Gameboy *gb, void *entryptr);
 void CCF(Gameboy *gb, void *entryptr);
 void SCF(Gameboy *gb, void *entryptr);
 void DAA(Gameboy *gb, void *entryptr);
+void RRA(Gameboy *gb, void *entryptr);
 void RST(Gameboy *gb, void *entryptr);
 void RST_38h(Gameboy *gb, void *entryptr);
 
