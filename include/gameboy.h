@@ -180,5 +180,6 @@ void BIT_RR(Gameboy *gb, void *entryptr);
 void SRL_R(Gameboy *gb, void *entryptr);
 void RR_R(Gameboy *gb, void *entryptr);
 void RL_R(Gameboy *gb, void *entryptr);
+void RES_R(Gameboy *gb, void *entryptr);
 
 #endif

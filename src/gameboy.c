@@ -625,6 +625,11 @@ void SRL_R(Gameboy *gb, void *entryptr) {
   SET_FLAGS(gb);
 }
 
+void RES_R(Gameboy *gb, void *entryptr) {
+  UNUSED(gb);
+  UNUSED(entryptr);
+}
+
 #undef Z_BIT
 #undef N_BIT
 #undef H_BIT
