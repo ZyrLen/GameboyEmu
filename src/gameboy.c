@@ -7,6 +7,10 @@
 #define N_BIT 6
 #define H_BIT 5
 #define C_BIT 4
+#define SET_FLAG(flag, n) (gb->F |= ((gb->flag) << (n)))
+#define SET_BIT(x, n) ((x) |= (1U << (n)))
+#define CLEAR_BIT(x, n) ((x) &= ~(1U << (n)))
+#define TOGGLE_BIT(x, n) ((x) ^= (1U << (n)))
 
 /*
 ADD (address)    DEC r              LD A,(address)    LD rr,u16     RET
@@ -19,10 +23,16 @@ CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
 static void SET_FLAGS(Gameboy *gb) {
   gb->F = gb->F & 0xF; // Clear flag bits
   // Flags are either 1 or zero, so the shift should be safe
-  gb->F |= (gb->z << Z_BIT);
-  gb->F |= (gb->n << N_BIT);
-  gb->F |= (gb->h << H_BIT);
-  gb->F |= (gb->c << C_BIT);
+  // The SET_FLAG macro still needs to be tested.
+  SET_FLAG(z, Z_BIT);
+  SET_FLAG(n, N_BIT);
+  SET_FLAG(h, H_BIT);
+  SET_FLAG(c, C_BIT);
+
+  // gb->F |= (gb->z << Z_BIT);
+  // gb->F |= (gb->n << N_BIT);
+  // gb->F |= (gb->h << H_BIT);
+  // gb->F |= (gb->c << C_BIT);
 }
 
 void AND(Gameboy *gb, void *entryptr) {

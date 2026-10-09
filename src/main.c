@@ -20,7 +20,7 @@
 // resolution is 160 x 144
 #define WIDTH 160
 #define HEIGHT 144
-#define HAlT_EXIT_CODE 200
+#define HALT_EXIT_CODE 200
 #define MAX_EXECUTIONS 2
 
 Gameboy gb;
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
     // }
     if (gb.HALT_ON) {
       // TODO
-      return HAlT_EXIT_CODE;
+      return HALT_EXIT_CODE;
     }
   }
 
