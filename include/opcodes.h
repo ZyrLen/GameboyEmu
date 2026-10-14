@@ -6,19 +6,19 @@
 typedef struct Gameboy Gameboy;
 
 typedef struct {
-  void *arg; // Used for single Register (R or RR) instructions, and SP value
-  void (*handler)(Gameboy *gb, void *arg);
-  const char *mnemonic;
-  uint8_t mcycles;
-  uint8_t mcyclesTrue; // If condition is true
-  uint8_t *R1; // Used for Two Register instructions
-  uint8_t *R2; // Used for Two Register instructions
-  struct {
-    uint8_t nbit;
-    uint8_t isHL;
-  } BitArgs;
-  uint16_t *address; // If it wasn't a pointer, the value does not change after
-                     // start of program
+	void *arg; // Used for single Register (R or RR) instructions, and SP value
+	void (*handler)(Gameboy *gb, void *arg);
+	const char *mnemonic;
+	uint8_t mcycles;
+	uint8_t mcyclesTrue; // If condition is true
+	uint8_t *R1; // Used for Two Register instructions
+	uint8_t *R2; // Used for Two Register instructions
+	struct {
+		uint8_t nbit;
+		uint8_t isHL;
+	} BitArgs;
+	uint16_t *address; // If it wasn't a pointer, the value does not change after
+				 // start of program
 } OpcodeEntry;
 
 extern OpcodeEntry opcodeTable[256];

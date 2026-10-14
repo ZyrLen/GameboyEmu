@@ -26,78 +26,78 @@ typedef uint32_t u32;
 #define IF io[0xF]
 
 struct PPU {
-  u32 framebuf[144][160];
-  u8 tilemap[2][32*32];
+	u32 framebuf[144][160];
+	u8 tilemap[2][32*32];
 };
 
 typedef struct Gameboy {
-  u16 pc;
-  u16 sp;
+	u16 pc;
+	u16 sp;
 
-  union {
-    struct {
-      u8 F, A;
-    };
-    u16 AF;
-  };
-  union {
-    struct {
-      u8 C, B;
-    };
-    u16 BC;
-  };
-  union {
-    struct {
-      u8 E, D;
-    };
-    u16 DE;
-  };
-  union {
-    struct {
-      u8 L, H;
-    };
-    u16 HL;
-  };
+	union {
+		struct {
+			u8 F, A;
+		};
+		u16 AF;
+	};
+	union {
+		struct {
+			u8 C, B;
+		};
+		u16 BC;
+	};
+	union {
+		struct {
+			u8 E, D;
+		};
+		u16 DE;
+	};
+	union {
+		struct {
+			u8 L, H;
+		};
+		u16 HL;
+	};
 
-  u8 state; // Tracks clock cycles
-  u8 z;     // Zero flag
-  u8 n;     // Subtraction Flag (BCD)
-  u8 h;     // Half Carry Flag (BCD)
-  u8 c;     // Carry Flag
+	u8 state; // Tracks clock cycles
+	u8 z;			// Zero flag
+	u8 n;			// Subtraction Flag (BCD)
+	u8 h;			// Half Carry Flag (BCD)
+	u8 c;			// Carry Flag
 
-  /* Memory Map (MMU) */
-  int biosComplete;
-  u8 bios[0x100];
-  union {
-    u8 mem[0x10000];
-    struct {
-      u8 ROM[2][ROM_SIZE];        // 0000 - 3FFF and 4000 - 7FFF
-      u8 VRAM[VRAM_SIZE];         // 8000 - 9FFF
-      u8 ERAM[ERAM_SIZE];         // A000 - BFFF
-      u8 WRAM[WRAM_SIZE];         // C000 - DFFF split into two chunks.
-      u8 EchoRAM[EchoRAM_SIZE];   // E000 - FDFF Echo of WRAM
-      u8 OAM[OAM_SIZE];           // FE00 - FE9F Object attribute memory
-      u8 Unusable[Unusable_SIZE]; // FEA0 - FEFF
-      u8 io[io_SIZE];             // FF00 - FF7F
-      u8 HRAM[HRAM_SIZE];         // FF80 - FFFE
-      u8 IE;                      // FFFF
-    };
-  };
+	/* Memory Map (MMU) */
+	int biosComplete;
+	u8 bios[0x100];
+	union {
+		u8 mem[0x10000];
+		struct {
+			u8 ROM[2][ROM_SIZE];		// 0000 - 3FFF and 4000 - 7FFF
+			u8 VRAM[VRAM_SIZE];		// 8000 - 9FFF
+			u8 ERAM[ERAM_SIZE];		// A000 - BFFF
+			u8 WRAM[WRAM_SIZE];		// C000 - DFFF split into two chunks.
+			u8 EchoRAM[EchoRAM_SIZE];		// E000 - FDFF Echo of WRAM
+			u8 OAM[OAM_SIZE];			// FE00 - FE9F Object attribute memory
+			u8 Unusable[Unusable_SIZE]; // FEA0 - FEFF
+			u8 io[io_SIZE];			// FF00 - FF7F
+			u8 HRAM[HRAM_SIZE];		// FF80 - FFFE
+			u8 IE;				// FFFF
+		};
+	};
 
-  u8 HALT_ON;
-  u8 IME;
-  struct PPU ppu;
+	u8 HALT_ON;
+	u8 IME;
+	struct PPU ppu;
 } Gameboy;
 
 // extern Gameboy gb;
 
 /* General Opcode Functions */
 /*
-ADD (address)    DEC r              LD A,(address)    LD rr,u16     RET
-BIT n,r          INC r              LD r,r            LD (HL+),A    RLA
-CALL address     INC rr             LD r,u8           LD (HL-),A    RL r
-CP u8            JR cond,address    LD r,(address)    POP rr        SUB r
-CP (HL)          LD (address),A     LD (address),r    PUSH rr       XOR r
+ADD (address)	 DEC r				LD A,(address)		LD rr,u16			RET
+BIT n,r		 INC r				LD r,r				LD (HL+),A		RLA
+CALL address	 INC rr				LD r,u8				LD (HL-),A		RL r
+CP u8		 JR cond,address		LD r,(address)		POP rr			SUB r
+CP (HL)		 LD (address),A			LD (address),r		PUSH rr			XOR r
 */
 // Once Cycle instructions, does not include HL as operands
 // Right half of list for now
